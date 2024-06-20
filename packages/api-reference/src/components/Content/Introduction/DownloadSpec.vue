@@ -1,38 +1,29 @@
 <script lang="ts" setup>
-import { isJsonString } from '../../../helpers'
+import { inject } from 'vue'
 
-defineProps<{
-  value: string
+import { HIDE_DOWNLOAD_BUTTON_SYMBOL, downloadSpecBus } from '../../../helpers'
+
+const props = defineProps<{
+  specTitle?: string
 }>()
 
-/* Generate a download URL for the parsedSpec */
-function inlineDownloadUrl(content: string) {
-  const blob = isJsonString(content)
-    ? new Blob([content], {
-        type: 'application/json',
-      })
-    : new Blob([content], {
-        type: 'application/x-yaml',
-      })
+const getHideDownloadButtonSymbol = inject(HIDE_DOWNLOAD_BUTTON_SYMBOL)
 
-  return URL.createObjectURL(blob)
-}
-
-/* Generate a filename for the parsedSpec */
-function getFilename(content: string) {
-  return isJsonString(content) ? 'spec.json' : 'spec.yaml'
+// id is retrieved at the layout level
+const handleDownloadClick = () => {
+  downloadSpecBus.emit({ id: '', specTitle: props.specTitle })
 }
 </script>
 <template>
-  <div
-    v-if="value"
-    class="download">
+  <div class="download">
     <div class="download-cta">
-      <a
-        :download="getFilename(value)"
-        :href="inlineDownloadUrl(value)">
+      <button
+        v-if="!getHideDownloadButtonSymbol?.()"
+        class="download-button"
+        type="button"
+        @click="handleDownloadClick">
         Download OpenAPI Spec
-      </a>
+      </button>
     </div>
   </div>
 </template>
@@ -41,12 +32,13 @@ function getFilename(content: string) {
 .download-cta {
   margin-bottom: 24px;
 }
-.download-cta a {
-  color: var(--theme-color-accent, var(--default-theme-color-accent));
-  text-decoration: none;
-  font-size: var(--theme-paragraph, var(--default-theme-paragraph));
+.download-cta .download-button {
+  color: var(--scalar-color-accent);
+  text-decoration: var(--scalar-text-decoration) !important;
+  font-size: var(--scalar-paragraph);
+  cursor: pointer;
 }
-.download-cta a:hover {
-  text-decoration: underline;
+.download-cta .download-button:hover {
+  text-decoration: var(--scalar-text-decoration-hover) !important;
 }
 </style>

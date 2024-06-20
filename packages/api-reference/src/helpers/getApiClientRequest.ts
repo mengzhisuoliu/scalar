@@ -1,17 +1,20 @@
-import type { ClientRequestConfig } from '@scalar/api-client'
-
+import {
+  type ClientRequestConfig,
+  type ServerState,
+  getRequestFromAuthentication,
+  getUrlFromServerState,
+} from '@scalar/api-client'
 import type {
   AuthenticationState,
-  ServerState,
   TransformedOperation,
-} from '../types'
+} from '@scalar/oas-utils'
 import {
-  getHarRequest,
   getParametersFromOperation,
-  getRequestFromAuthentication,
   getRequestFromOperation,
-  getUrlFromServerState,
-} from './'
+} from '@scalar/oas-utils/spec-getters'
+import type { OpenAPIV3 } from '@scalar/openapi-parser'
+
+import { getHarRequest } from '../helpers'
 
 /**
  * Generate parameters for the request
@@ -20,21 +23,31 @@ export function getApiClientRequest({
   serverState,
   authenticationState,
   operation,
+  globalSecurity,
 }: {
   serverState: ServerState
-  authenticationState: AuthenticationState
   operation: TransformedOperation
+  authenticationState?: AuthenticationState | null
+  globalSecurity?: OpenAPIV3.SecurityRequirementObject[] | null
 }): ClientRequestConfig {
   const request = getHarRequest(
     {
       url: getUrlFromServerState(serverState),
     },
-    getRequestFromOperation(operation),
-    getRequestFromAuthentication(authenticationState),
+    getRequestFromOperation(operation, { requiredOnly: false }),
+    // Only generate authentication parameters if an authentication state is passed.
+    authenticationState
+      ? getRequestFromAuthentication(
+          authenticationState,
+          operation.information?.security ?? globalSecurity ?? [],
+        )
+      : {},
   )
 
-  const requestFromOperation = getRequestFromOperation(operation)
-  const variables = getParametersFromOperation(operation, 'path')
+  const requestFromOperation = getRequestFromOperation(operation, {
+    requiredOnly: false,
+  })
+  const variables = getParametersFromOperation(operation, 'path', false)
 
   return {
     id: operation.operationId,
@@ -42,16 +55,20 @@ export function getApiClientRequest({
     type: request.method,
     path: requestFromOperation.path ?? '',
     variables,
-    cookies: request.cookies.map((cookie) => {
-      return { ...cookie, enabled: true }
+    cookies: enable(request.cookies),
+    query: request.queryString.map((queryString: any) => {
+      const query: typeof queryString & { required?: boolean } = queryString
+      return { ...queryString, enabled: query.required ?? true }
     }),
-    query: request.queryString.map((queryString) => {
-      return { ...queryString, enabled: true }
-    }),
-    headers: request.headers.map((header) => {
-      return { ...header, enabled: true }
-    }),
+    headers: enable(request.headers),
     url: getUrlFromServerState(serverState) ?? '',
     body: request.postData?.text,
   }
+}
+
+/**
+ * Enable all given parameters
+ */
+function enable(items?: any[]) {
+  return (items ?? []).map((item) => ({ ...item, enabled: true }))
 }

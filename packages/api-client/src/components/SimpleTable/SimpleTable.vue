@@ -1,7 +1,9 @@
 <template>
-  <table class="simple-table">
-    <slot />
-  </table>
+  <div class="simple-table-container">
+    <table class="simple-table">
+      <slot />
+    </table>
+  </div>
 </template>
 
 <style scoped>
@@ -9,9 +11,11 @@
   all: unset;
   display: table;
   width: 100%;
-  border-spacing: 0;
-  box-shadow: 0 0 0 1px
-    var(--theme-border-color, var(--default-theme-border-color));
-  border-radius: var(--theme-radius, var(--default-theme-radius));
+}
+.simple-table-container {
+  border-right: none;
+  border-left: none;
+  width: 100%;
+  overflow: auto;
 }
 </style>

@@ -1,21 +1,57 @@
-import { type ThemeId } from '@scalar/themes'
-import type { MetaFlatInput } from '@unhead/schema'
-import type { HarRequest } from 'httpsnippet-lite'
-import { type OpenAPIV2, type OpenAPIV3, type OpenAPIV3_1 } from 'openapi-types'
-import { type DeepReadonly, type Slot } from 'vue'
+import type {
+  AuthenticationState,
+  ContentType,
+  Spec,
+  SpecConfiguration,
+} from '@scalar/oas-utils'
+import type { ThemeId } from '@scalar/themes'
+import type { UseSeoMetaInput } from '@unhead/schema'
+import type { HarRequest, TargetId } from 'httpsnippet-lite'
+import type { Slot } from 'vue'
+
+// ---------------------------------------------------------------------------
+// Types copied from package as they are not exported
+type ClientInfo = {
+  key: string
+  title: string
+  link: string
+  description: string
+}
+export type Server = {
+  url: string
+  description?: string
+}
+
+export type TargetInfo = {
+  key: TargetId
+  title: string
+  extname: `.${string}` | null
+  default: string
+}
+
+export type AvailableTarget = TargetInfo & {
+  clients: ClientInfo[]
+}
+// ---------------------------------------------------------------------------
 
 export type ReferenceProps = {
   configuration?: ReferenceConfiguration
 }
 
-export type SpecConfiguration = {
-  /** URL to a Swagger/OpenAPI file */
-  url?: string
-  /** Swagger/Open API spec */
-  content?: string | Record<string, any> | (() => Record<string, any>)
-  /** The result of @scalar/swagger-parser */
-  preparsedContent?: Record<any, any>
+export type ReferenceLayoutProps = {
+  configuration: ReferenceConfiguration
+  parsedSpec: Spec
+  rawSpec: string
+  isDark: boolean
 }
+
+export type HiddenClients =
+  // Just hide all
+  | true
+  // Exclude whole targets or just specific clients
+  | Partial<Record<TargetInfo['key'], boolean | ClientInfo['key'][]>>
+  // Backwards compatibility with the previous behavior ['fetch', 'xhr']
+  | ClientInfo['key'][]
 
 export type ReferenceConfiguration = {
   /** A string to use one of the color presets */
@@ -30,94 +66,104 @@ export type ReferenceConfiguration = {
   isEditable?: boolean
   /** Whether to show the sidebar */
   showSidebar?: boolean
-  /** Whether dark mode is on or off (light mode) */
+  /**
+   * Whether to show models in the sidebar, search, and content.
+   *
+   * @default false
+   */
+  hideModels?: boolean
+  /**
+   * Whether to show the "Download OpenAPI Specification" button
+   *
+   * @default false
+   */
+  hideDownloadButton?: boolean
+  /** Whether dark mode is on or off initially (light mode) */
   darkMode?: boolean
-  /** Key used with CNTRL/CMD to open the search modal (defaults to 'k' e.g. CMD+k) */
-  searchHotKey?: string
+  /** Key used with CTRL/CMD to open the search modal (defaults to 'k' e.g. CMD+k) */
+  searchHotKey?:
+    | 'a'
+    | 'b'
+    | 'c'
+    | 'd'
+    | 'e'
+    | 'f'
+    | 'g'
+    | 'h'
+    | 'i'
+    | 'j'
+    | 'k'
+    | 'l'
+    | 'm'
+    | 'n'
+    | 'o'
+    | 'p'
+    | 'q'
+    | 'r'
+    | 's'
+    | 't'
+    | 'u'
+    | 'v'
+    | 'w'
+    | 'x'
+    | 'y'
+    | 'z'
   /**
    * If used, passed data will be added to the HTML header
    * @see https://unhead.unjs.io/usage/composables/use-seo-meta
    * */
-  metaData?: MetaFlatInput
+  metaData?: UseSeoMetaInput
   /**
    * List of httpsnippet clients to hide from the clients menu
    * By default hides Unirest, pass `[]` to show all clients
-   * @see https://github.com/Kong/httpsnippet/wiki/Targets
    */
-  hiddenClients?: string[]
+  hiddenClients?: HiddenClients
+  /**
+   * List of servers to override the openapi spec servers
+   *
+   * @default undefined
+   * @example [{ url: 'https://api.scalar.com', description: 'Production server' }]
+   */
+  servers?: Server[]
   /** Custom CSS to be added to the page */
   customCss?: string
   /** onSpecUpdate is fired on spec/swagger content change */
   onSpecUpdate?: (spec: string) => void
+  /** Prefill authentication */
+  authentication?: Partial<AuthenticationState>
+  /**
+   * Route using paths instead of hashes, your server MUST support this
+   * for example vue router needs a catch all so any subpaths are included
+   *
+   * @example
+   * '/standalone-api-reference/:custom(.*)?'
+   *
+   * @experimental
+   * @default undefined
+   */
+  pathRouting?: PathRouting
+  /**
+   * The baseServerURL is used when the spec servers are relative paths and we are using SSR.
+   * On the client we can grab the window.location.origin but on the server we need
+   * to use this prop.
+   *
+   * @default undefined
+   * @example 'http://localhost:3000'
+   */
+  baseServerURL?: string
+  /**
+   * We’re using Inter and JetBrains Mono as the default fonts. If you want to use your own fonts, set this to false.
+   *
+   * @default true
+   */
+  withDefaultFonts?: boolean
 }
 
-/** Default reference configuration */
-export const DEFAULT_CONFIG: DeepReadonly<ReferenceConfiguration> = {
-  spec: {
-    content: undefined,
-    url: undefined,
-    preparsedContent: undefined,
-  },
-  proxy: undefined,
-  theme: 'default',
-  showSidebar: true,
-  isEditable: false,
+export type PathRouting = {
+  basePath: string
 }
 
 export type GettingStartedExamples = 'Petstore' | 'CoinMarketCap'
-
-export type Schema = {
-  type: string
-  name?: string
-  example?: any
-  default?: any
-  format?: string
-  description?: string
-  properties?: Record<string, Schema>
-}
-
-export type Parameters = {
-  // Fixed Fields
-  name: string
-  in?: string
-  description?: string
-  required?: boolean
-  deprecated?: boolean
-  allowEmptyValue?: boolean
-  // Other
-  style?: 'form' | 'simple'
-  explode?: boolean
-  allowReserved?: boolean
-  schema?: Schema
-  example?: any
-  examples?: Map<string, any>
-}
-
-export type Response = {
-  description: string
-  content: any
-}
-
-export type Information = {
-  description?: string
-  operationId?: string | number
-  parameters?: Parameters[]
-  responses?: Record<string, Response>
-  security?: OpenAPIV3.SecurityRequirementObject[]
-  requestBody?: RequestBody
-  summary?: string
-  tags?: string[]
-  deprecated?: boolean
-}
-
-export type Operation = {
-  httpVerb: string
-  path: string
-  operationId?: string
-  name?: string
-  description?: string
-  information?: Information
-}
 
 export type ExampleResponseHeaders = Record<
   string,
@@ -131,15 +177,6 @@ export type ExampleResponseHeaders = Record<
   }
 >
 
-export type TransformedOperation = Operation & {
-  pathParameters?: Parameters[]
-}
-
-export type Tag = {
-  name: string
-  description: string
-  operations: TransformedOperation[]
-}
 export type Parameter = {
   name: string
   required: boolean
@@ -167,30 +204,8 @@ export type ContentSchema = {
   }
 }
 
-export type ContentType =
-  | 'application/json'
-  | 'application/xml'
-  | 'text/plain'
-  | 'text/html'
-  | 'application/octet-stream'
-  | 'application/x-www-form-urlencoded'
-  | 'multipart/form-data'
-
 export type Content = {
   [key in ContentType]: ContentSchema
-}
-
-// Create a mapped type to ensure keys are a subset of ContentType
-export type RequestBodyMimeTypes = {
-  [K in ContentType]?: {
-    schema?: any
-    example?: any
-    examples?: any
-  }
-}
-
-export type RequestBody = {
-  content?: RequestBodyMimeTypes
 }
 
 export type Contact = {
@@ -209,108 +224,6 @@ export type Info = {
   contact?: Contact
   license?: License
   version?: string
-}
-
-export type ExternalDocs = {
-  description: string
-  url: string
-}
-
-export type ServerVariables = Record<
-  string,
-  {
-    default?: string | number
-    description?: string
-    enum?: (string | number)[]
-  }
->
-
-export type Server = {
-  url: string
-  description?: string
-  variables?: ServerVariables
-}
-
-export type SecurityScheme =
-  | Record<string, never> // Empty objects
-  | OpenAPIV2.SecuritySchemeObject
-  | OpenAPIV3.SecuritySchemeObject
-  | OpenAPIV3_1.SecuritySchemeObject
-
-export type Components = Omit<
-  OpenAPIV3.ComponentsObject | OpenAPIV3_1.ComponentsObject,
-  'securitySchemes'
-> & {
-  securitySchemes?: Record<string, SecurityScheme>
-}
-
-export type Definitions = OpenAPIV2.DefinitionsObject
-
-export type Webhooks = Record<
-  string,
-  Record<OpenAPIV3_1.HttpMethods, TransformedOperation>
->
-
-export type Spec = {
-  tags?: Tag[]
-  info: Info
-  host?: string
-  basePath?: string
-  schemes?: string[]
-  externalDocs?: ExternalDocs
-  servers?: Server[]
-  components?: Components
-  webhooks?: Webhooks
-  definitions?: Definitions
-  openapi?: string
-  swagger?: string
-}
-
-export type AuthenticationState = {
-  securitySchemeKey: string | null
-  securitySchemes?: Record<string, SecurityScheme>
-  http: {
-    basic: {
-      username: string
-      password: string
-    }
-    bearer: {
-      token: string
-    }
-  }
-  apiKey: {
-    token: string
-  }
-  oAuth2: {
-    clientId: string
-    scopes: string[]
-  }
-}
-
-export type Variable = {
-  [key: string]: string
-}
-
-export type ServerState = {
-  selectedServer: null | number
-  description?: string
-  servers: Server[]
-  variables: Variable[]
-}
-
-export type Header = {
-  name: string
-  value: string
-}
-
-export type Query = {
-  name: string
-  value: string
-}
-
-export type Cookie = {
-  name: string
-  value: string
 }
 
 export type HarRequestWithPath = HarRequest & {

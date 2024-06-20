@@ -1,5 +1,953 @@
 # @scalar/api-client
 
+## 1.3.14
+
+### Patch Changes
+
+- b1fd179: fix: remove reset style wrapper from security schemes
+
+## 1.3.13
+
+### Patch Changes
+
+- 88ae0a5: fix: add api client right to scope
+- 5e92eab: feat(#doc-1996): themes css exports
+- Updated dependencies [5e92eab]
+  - @scalar/components@0.11.6
+  - @scalar/themes@0.9.5
+
+## 1.3.12
+
+### Patch Changes
+
+- 362d47a: chore: less @ts-ignore comments
+- Updated dependencies [362d47a]
+- Updated dependencies [2ca1af2]
+- Updated dependencies [627e0e5]
+  - @scalar/oas-utils@0.2.3
+  - @scalar/themes@0.9.4
+  - @scalar/components@0.11.5
+
+## 1.3.11
+
+### Patch Changes
+
+- Updated dependencies [3d6ca80]
+- Updated dependencies [0fae180]
+  - @scalar/components@0.11.4
+  - @scalar/themes@0.9.3
+
+## 1.3.10
+
+### Patch Changes
+
+- db89d01: fix: scoping request component styles
+
+## 1.3.9
+
+### Patch Changes
+
+- Updated dependencies [7dbb241]
+  - @scalar/components@0.11.3
+
+## 1.3.8
+
+### Patch Changes
+
+- a2cb3c3: Migrate away from unintended peer dependencies
+- Updated dependencies [a2cb3c3]
+  - @scalar/use-codemirror@0.11.2
+  - @scalar/use-tooltip@0.7.3
+  - @scalar/components@0.11.2
+  - @scalar/use-toasts@0.7.2
+  - @scalar/oas-utils@0.2.2
+  - @scalar/themes@0.9.2
+
+## 1.3.7
+
+### Patch Changes
+
+- Updated dependencies [c65697c]
+  - @scalar/use-tooltip@0.7.2
+
+## 1.3.6
+
+### Patch Changes
+
+- e0fc110: chore: patch bump all package
+- f0acc89: chore: upgrade to new @scalar/openapi-parser version
+- Updated dependencies [e0fc110]
+- Updated dependencies [f0acc89]
+  - @scalar/components@0.11.1
+  - @scalar/oas-utils@0.2.1
+  - @scalar/themes@0.9.1
+  - @scalar/use-codemirror@0.11.1
+  - @scalar/use-toasts@0.7.1
+  - @scalar/use-tooltip@0.7.1
+
+## 2.0.0
+
+### Minor Changes
+
+- 7f8ef74: chore: remove aliasing
+
+### Patch Changes
+
+- 1de697b: fix: URL is not encoded when sent to the proxy
+- 689677a: fix: auto importing css backup
+- 326dcfb: chore: remove @scalar/use-modal package
+- 8494349: Migrate to highlightjs based syntax highlighting
+- b38c7ed: Update build configs to a standardized format
+- 6fbb57e: feat: release all the packages
+- e63b12d: feat: better error output for failed requests
+- Updated dependencies [190bcb6]
+- Updated dependencies [7f8ef74]
+- Updated dependencies [f82a767]
+- Updated dependencies [326dcfb]
+- Updated dependencies [96347a1]
+- Updated dependencies [8494349]
+- Updated dependencies [b38c7ed]
+- Updated dependencies [6fbb57e]
+- Updated dependencies [94084bf]
+- Updated dependencies [c5760b9]
+  - @scalar/components@0.11.0
+  - @scalar/use-codemirror@0.11.0
+  - @scalar/use-tooltip@0.7.0
+  - @scalar/use-toasts@0.7.0
+  - @scalar/oas-utils@0.2.0
+  - @scalar/themes@0.9.0
+
+## 1.3.4
+
+### Patch Changes
+
+- Updated dependencies [55e01dd]
+  - @scalar/themes@0.8.2
+  - @scalar/components@0.10.1
+
+## 1.3.3
+
+### Patch Changes
+
+- Updated dependencies [db7864a]
+  - @scalar/themes@0.8.1
+  - @scalar/components@0.10.1
+
+## 1.3.2
+
+### Patch Changes
+
+- Updated dependencies [c951512]
+- Updated dependencies [961690d]
+  - @scalar/oas-utils@0.1.17
+  - @scalar/components@0.10.1
+
+## 1.3.1
+
+### Patch Changes
+
+- 195ca18: fix: align show hide icons with icon standards
+- Updated dependencies [83bfad8]
+- Updated dependencies [34eba38]
+- Updated dependencies [843218d]
+- Updated dependencies [195ca18]
+  - @scalar/components@0.10.0
+
+## 1.3.0
+
+### Minor Changes
+
+- 7d3bc16: feat: css files must be explicitly imported, check the docs
+- 7d3bc16: BREAKING CHANGE: css must now be explicitly imported, see docs for more details
+
+### Patch Changes
+
+- Updated dependencies [7d3bc16]
+- Updated dependencies [7d3bc16]
+- Updated dependencies [a839889]
+  - @scalar/components@0.9.0
+  - @scalar/themes@0.8.0
+
+## 1.2.39
+
+### Patch Changes
+
+- Updated dependencies [18ecd33]
+- Updated dependencies [26e2392]
+  - @scalar/components@0.8.0
+
+## 1.2.38
+
+### Patch Changes
+
+- cc5402c: feat: OpenAuth 2.0 password grant
+- Updated dependencies [cc5402c]
+- Updated dependencies [cc5402c]
+  - @scalar/use-toasts@0.6.7
+  - @scalar/oas-utils@0.1.16
+  - @scalar/components@0.7.15
+
+## 1.2.37
+
+### Patch Changes
+
+- d60cc10: fix: api client body on delete request
+
+## 1.2.36
+
+### Patch Changes
+
+- da7cdb6: fix: authentication card form style
+
+## 1.2.35
+
+### Patch Changes
+
+- Updated dependencies [f472998]
+  - @scalar/oas-utils@0.1.15
+  - @scalar/components@0.7.14
+
+## 1.2.34
+
+### Patch Changes
+
+- be75488: fix: update password show hide icon
+- Updated dependencies [be75488]
+  - @scalar/components@0.7.13
+
+## 1.2.33
+
+### Patch Changes
+
+- cfba428: fix: always return html vs error rendering
+
+## 1.2.32
+
+### Patch Changes
+
+- Updated dependencies [7205137]
+- Updated dependencies [d369ac4]
+- Updated dependencies [50480c7]
+  - @scalar/oas-utils@0.1.14
+  - @scalar/components@0.7.12
+
+## 1.2.31
+
+### Patch Changes
+
+- 5aa656f: feat: [BREAKING CHANGE] use new HTTP proxy (https://github.com/scalar/scalar/pull/1703)
+- Updated dependencies [5aa656f]
+  - @scalar/oas-utils@0.1.13
+  - @scalar/components@0.7.11
+
+## 1.2.30
+
+### Patch Changes
+
+- 504ff7a: fix: request / response active states margins, etc
+- 61b8ddc: fix: doesn’t render preview for mimetype variations like application/foobar+json
+- Updated dependencies [dfe51b1]
+- Updated dependencies [61b8ddc]
+- Updated dependencies [165b901]
+- Updated dependencies [925572f]
+  - @scalar/components@0.7.10
+  - @scalar/oas-utils@0.1.12
+
+## 1.2.29
+
+### Patch Changes
+
+- Updated dependencies [69a617c]
+  - @scalar/themes@0.7.11
+  - @scalar/components@0.7.9
+
+## 1.2.28
+
+### Patch Changes
+
+- 1ce9661: feat: intro cards redesign
+- Updated dependencies [1ce9661]
+  - @scalar/themes@0.7.10
+  - @scalar/components@0.7.9
+
+## 1.2.27
+
+### Patch Changes
+
+- 7ba851f: feature: client ui updates
+- Updated dependencies [7ba851f]
+  - @scalar/use-codemirror@0.10.5
+
+## 1.2.26
+
+### Patch Changes
+
+- Updated dependencies [e3a72bb]
+  - @scalar/components@0.7.9
+
+## 1.2.25
+
+### Patch Changes
+
+- 79e3caa: chore: replace petstore example with galaxy example
+- e022ee6: fix: color single security scheme
+- Updated dependencies [79e3caa]
+  - @scalar/components@0.7.8
+
+## 1.2.24
+
+### Patch Changes
+
+- 624604e: chore: move http status codes to oas-utils
+- Updated dependencies [624604e]
+- Updated dependencies [624604e]
+  - @scalar/oas-utils@0.1.11
+  - @scalar/components@0.7.7
+
+## 1.2.23
+
+### Patch Changes
+
+- 3a4ff3c: fix: required api client bg
+
+## 1.2.22
+
+### Patch Changes
+
+- a13f853: feat: update api client ui
+- Updated dependencies [a13f853]
+  - @scalar/use-codemirror@0.10.4
+
+## 1.2.21
+
+### Patch Changes
+
+- f871c28: fix: api client address bar url
+- 3748dc5: feat: api client toggle sidebar hotkey
+
+## 1.2.20
+
+### Patch Changes
+
+- 0640c52: feat: api client address bar style update
+- 84399ab: feat: add api client response empty state
+- a80345a: fix: vertical alignment of client response empty state
+- Updated dependencies [6e67167]
+  - @scalar/components@0.7.6
+
+## 1.2.19
+
+### Patch Changes
+
+- fa2cc5b: fix: history toggle location
+- Updated dependencies [836869b]
+  - @scalar/components@0.7.5
+
+## 1.2.18
+
+### Patch Changes
+
+- 26d9146: feat: improved api client modal
+- Updated dependencies [26d9146]
+  - @scalar/components@0.7.4
+
+## 1.2.17
+
+### Patch Changes
+
+- d649691: fix: request body display
+
+## 1.2.16
+
+### Patch Changes
+
+- 45dc04b: fix: can’t release packages
+- Updated dependencies [45dc04b]
+  - @scalar/use-codemirror@0.10.3
+  - @scalar/use-tooltip@0.6.2
+  - @scalar/components@0.7.3
+  - @scalar/oas-utils@0.1.10
+  - @scalar/use-modal@0.3.3
+  - @scalar/themes@0.7.9
+
+## 1.2.15
+
+### Patch Changes
+
+- 05e2e27: chore: add provenance statement
+- Updated dependencies [05e2e27]
+  - @scalar/components@0.7.2
+  - @scalar/oas-utils@0.1.9
+  - @scalar/themes@0.7.8
+  - @scalar/use-codemirror@0.10.2
+  - @scalar/use-modal@0.3.2
+  - @scalar/use-tooltip@0.6.1
+
+## 1.2.14
+
+### Patch Changes
+
+- Updated dependencies [085a0c2]
+- Updated dependencies [fa10d45]
+  - @scalar/oas-utils@0.1.8
+  - @scalar/components@0.7.1
+
+## 1.2.13
+
+### Patch Changes
+
+- c68939c: feat: allow toggling of password fields
+- 07211ad: chore: added new lint rule for type importing for better perf
+- Updated dependencies [c68939c]
+- Updated dependencies [07211ad]
+- Updated dependencies [d4fa19b]
+- Updated dependencies [1c18f77]
+- Updated dependencies [830b3c8]
+  - @scalar/components@0.7.0
+  - @scalar/oas-utils@0.1.7
+  - @scalar/use-modal@0.3.1
+  - @scalar/themes@0.7.7
+
+## 1.2.12
+
+### Patch Changes
+
+- c6e4385: fix: passing a prefilled token as null throws an exception
+
+## 1.2.11
+
+### Patch Changes
+
+- Updated dependencies [2706d57]
+  - @scalar/components@0.6.1
+
+## 1.2.10
+
+### Patch Changes
+
+- Updated dependencies [fc2c90f]
+  - @scalar/components@0.6.0
+
+## 1.2.9
+
+### Patch Changes
+
+- Updated dependencies [0a77380]
+  - @scalar/themes@0.7.6
+  - @scalar/components@0.5.5
+
+## 1.2.8
+
+### Patch Changes
+
+- Updated dependencies [2700c5c]
+  - @scalar/components@0.5.5
+  - @scalar/themes@0.7.5
+
+## 1.2.7
+
+### Patch Changes
+
+- Updated dependencies [79485ff]
+- Updated dependencies [92b5b2a]
+  - @scalar/components@0.5.4
+
+## 1.2.6
+
+### Patch Changes
+
+- Updated dependencies [86d1363]
+- Updated dependencies [bc3f3af]
+  - @scalar/themes@0.7.4
+  - @scalar/components@0.5.3
+
+## 1.2.5
+
+### Patch Changes
+
+- Updated dependencies [e8ef57e]
+- Updated dependencies [1353154]
+  - @scalar/components@0.5.2
+
+## 1.2.4
+
+### Patch Changes
+
+- Updated dependencies [4d31b19]
+  - @scalar/themes@0.7.3
+  - @scalar/components@0.5.1
+
+## 1.2.3
+
+### Patch Changes
+
+- Updated dependencies [96ded16]
+- Updated dependencies [24662c3]
+  - @scalar/use-codemirror@0.10.1
+  - @scalar/components@0.5.1
+
+## 1.2.2
+
+### Patch Changes
+
+- Updated dependencies [85a0074]
+  - @scalar/themes@0.7.2
+  - @scalar/components@0.5.0
+
+## 1.2.1
+
+### Patch Changes
+
+- d77acdd: fix: missing css font
+- Updated dependencies [d77acdd]
+  - @scalar/themes@0.7.1
+  - @scalar/components@0.5.0
+
+## 1.2.0
+
+### Minor Changes
+
+- 0e64a36: refactor: rename all --theme-_ variables to --scalar-_
+
+### Patch Changes
+
+- 22f2858: chore: ran syncpack to update packages
+- Updated dependencies [22f2858]
+- Updated dependencies [0e64a36]
+  - @scalar/use-codemirror@0.10.0
+  - @scalar/use-tooltip@0.6.0
+  - @scalar/components@0.5.0
+  - @scalar/oas-utils@0.1.6
+  - @scalar/use-modal@0.3.0
+  - @scalar/themes@0.7.0
+
+## 1.1.16
+
+### Patch Changes
+
+- Updated dependencies [e6d1b81]
+- Updated dependencies [3ba9774]
+- Updated dependencies [3ba9774]
+  - @scalar/use-modal@0.2.10
+  - @scalar/oas-utils@0.1.5
+  - @scalar/components@0.4.11
+
+## 1.1.15
+
+### Patch Changes
+
+- Updated dependencies [24b3c2a]
+  - @scalar/oas-utils@0.1.4
+
+## 1.1.14
+
+### Patch Changes
+
+- Updated dependencies [95bac72]
+  - @scalar/components@0.4.10
+
+## 1.1.13
+
+### Patch Changes
+
+- b0b757d: feat: improve API Client request parameter tables
+
+## 1.1.12
+
+### Patch Changes
+
+- c14568f: feat: add custom security option
+- Updated dependencies [c14568f]
+  - @scalar/components@0.4.9
+  - @scalar/oas-utils@0.1.3
+
+## 1.1.11
+
+### Patch Changes
+
+- 8b0691b: feat: added future support for SSR server state hydration
+- Updated dependencies [8b0691b]
+  - @scalar/oas-utils@0.1.2
+
+## 1.1.10
+
+### Patch Changes
+
+- 999dfc9: feat: add authentication UI to the API client
+
+## 1.1.9
+
+### Patch Changes
+
+- Updated dependencies [d70bda7]
+  - @scalar/themes@0.6.7
+  - @scalar/components@0.4.8
+
+## 1.1.8
+
+### Patch Changes
+
+- 43421a6: fix: only lowercase hostname
+- ae193a8: feat: sidebar border indents + theme polish
+- Updated dependencies [5b83e30]
+- Updated dependencies [6889ad9]
+- Updated dependencies [ae193a8]
+  - @scalar/themes@0.6.6
+  - @scalar/use-codemirror@0.9.1
+  - @scalar/components@0.4.8
+
+## 1.1.7
+
+### Patch Changes
+
+- Updated dependencies [f861efa]
+  - @scalar/components@0.4.7
+
+## 1.1.6
+
+### Patch Changes
+
+- Updated dependencies [7d0092e]
+  - @scalar/components@0.4.6
+
+## 1.1.5
+
+### Patch Changes
+
+- 06c57ca: fix: buffer not available in browser environments
+
+## 1.1.4
+
+### Patch Changes
+
+- Updated dependencies [42b385b]
+  - @scalar/components@0.4.5
+
+## 1.1.3
+
+### Patch Changes
+
+- Updated dependencies [0c5e22c]
+  - @scalar/themes@0.6.5
+  - @scalar/components@0.4.4
+
+## 1.1.2
+
+### Patch Changes
+
+- c7241e8: fix: address bar changes do not have an effect on the actual request
+
+## 1.1.1
+
+### Patch Changes
+
+- 61a97e2: feat: make api client url editable
+
+## 1.1.0
+
+### Minor Changes
+
+- 31aae5e: chore: moved shared types and methods into oas-utils
+
+### Patch Changes
+
+- Updated dependencies [31aae5e]
+  - @scalar/oas-utils@0.1.1
+
+## 1.0.3
+
+### Patch Changes
+
+- e2491c1: chore: update axios
+
+## 1.0.2
+
+### Patch Changes
+
+- Updated dependencies [68cda2b]
+  - @scalar/themes@0.6.4
+  - @scalar/components@0.4.4
+
+## 1.0.1
+
+### Patch Changes
+
+- Updated dependencies [bbbba1f]
+- Updated dependencies [897990b]
+  - @scalar/components@0.4.4
+  - @scalar/themes@0.6.3
+
+## 1.0.0
+
+### Minor Changes
+
+- 7fb8273: Migrate to @scalar/openapi-parser
+
+### Patch Changes
+
+- 6036d25: fix: allow application/vnd.api+json return type
+- Updated dependencies [7fb8273]
+  - @scalar/use-codemirror@0.9.0
+  - @scalar/oas-utils@0.1.0
+
+## 0.12.18
+
+### Patch Changes
+
+- cecf074: Migrate to oas utils for basic spec operations
+- Updated dependencies [cecf074]
+  - @scalar/use-codemirror@0.8.10
+  - @scalar/oas-utils@0.0.4
+
+## 0.12.17
+
+### Patch Changes
+
+- ddc9b17: fix: re-added moving the components css into js so importing the css file is no longer needed
+- 775646a: fix: removed extra copy of vue from themes and some dependencies
+- ef3a015: chore: update to typescript 5.4
+- Updated dependencies [ddc9b17]
+- Updated dependencies [775646a]
+- Updated dependencies [ef3a015]
+  - @scalar/components@0.4.3
+  - @scalar/themes@0.6.2
+  - @scalar/use-codemirror@0.8.9
+  - @scalar/use-modal@0.2.9
+
+## 0.12.16
+
+### Patch Changes
+
+- Updated dependencies [4ef178f]
+  - @scalar/themes@0.6.1
+  - @scalar/components@0.4.2
+
+## 0.12.15
+
+### Patch Changes
+
+- Updated dependencies [ad2b95a]
+- Updated dependencies [ad2b95a]
+  - @scalar/themes@0.6.0
+  - @scalar/components@0.4.2
+
+## 0.12.14
+
+### Patch Changes
+
+- 3b672cc: fix: revert css changes to components lib
+- Updated dependencies [3b672cc]
+  - @scalar/components@0.4.2
+
+## 0.12.13
+
+### Patch Changes
+
+- c5e8b13: feat: hide secret credentials
+- Updated dependencies [c5e8b13]
+  - @scalar/components@0.4.1
+
+## 0.12.12
+
+### Patch Changes
+
+- 5bc2ebf: Add syntax highlighting back to codemirror
+- Updated dependencies [407a3af]
+- Updated dependencies [5bc2ebf]
+  - @scalar/components@0.4.0
+  - @scalar/use-codemirror@0.8.8
+
+## 0.12.11
+
+### Patch Changes
+
+- d16d07f: style: added scrollbar and border to api-client
+
+## 0.12.10
+
+### Patch Changes
+
+- Updated dependencies [5a94530]
+  - @scalar/use-codemirror@0.8.7
+
+## 0.12.9
+
+### Patch Changes
+
+- 6857b8d: fix: api client syntax highlighting
+- Updated dependencies [6857b8d]
+  - @scalar/components@0.3.0
+
+## 0.12.8
+
+### Patch Changes
+
+- Updated dependencies [51acf2c]
+  - @scalar/themes@0.5.10
+  - @scalar/components@0.2.6
+
+## 0.12.7
+
+### Patch Changes
+
+- Updated dependencies [c103201]
+- Updated dependencies [d2728c8]
+  - @scalar/components@0.2.6
+  - @scalar/themes@0.5.9
+
+## 0.12.6
+
+### Patch Changes
+
+- b9523b7: fix: allow application/problem+json return type
+
+## 0.12.5
+
+### Patch Changes
+
+- 1669b27: chore: update dependencies
+- 7ea052b: chore: remove some languages from CodeMirror
+- Updated dependencies [1669b27]
+- Updated dependencies [7ea052b]
+  - @scalar/use-codemirror@0.8.6
+  - @scalar/components@0.2.5
+  - @scalar/use-modal@0.2.8
+  - @scalar/themes@0.5.8
+
+## 0.12.4
+
+### Patch Changes
+
+- c6b95ca: chore: upgrade from Vite 4 to Vite 5
+- Updated dependencies [c6b95ca]
+  - @scalar/use-codemirror@0.8.5
+  - @scalar/components@0.2.4
+  - @scalar/use-modal@0.2.7
+  - @scalar/themes@0.5.7
+
+## 0.12.3
+
+### Patch Changes
+
+- Updated dependencies [3ade0d1]
+  - @scalar/use-modal@0.2.6
+
+## 0.12.2
+
+### Patch Changes
+
+- c23b2cb: fix: set max height on request body codemirror
+- 5b3f7d9: fix: updated scroll region padding to for chrome update
+- Updated dependencies [5b3f7d9]
+  - @scalar/use-modal@0.2.5
+  - @scalar/themes@0.5.6
+  - @scalar/components@0.2.3
+
+## 0.12.1
+
+### Patch Changes
+
+- 4fb6af9: chore: remove use-keyboard-event package
+
+## 0.12.0
+
+### Minor Changes
+
+- e0faebb: feat: add show more button to request variables and path params
+
+### Patch Changes
+
+- 92a8b9f: chore: update dependencies
+- abfb086: chore: remove unused CodeMirror CSS
+- 76f4041: chore: remove unused code
+- Updated dependencies [92a8b9f]
+- Updated dependencies [abfb086]
+  - @scalar/use-keyboard-event@0.5.9
+  - @scalar/use-codemirror@0.8.4
+  - @scalar/components@0.2.3
+  - @scalar/use-modal@0.2.4
+  - @scalar/themes@0.5.5
+
+## 0.11.5
+
+### Patch Changes
+
+- cb8139e7: fix: rollback api client proxy and request changes
+
+## 0.11.4
+
+### Patch Changes
+
+- 037029cc: fix: parse axios error responses as blobs
+
+## 0.11.3
+
+### Patch Changes
+
+- Updated dependencies [d4fff0de]
+  - @scalar/use-codemirror@0.8.3
+
+## 0.11.2
+
+### Patch Changes
+
+- f8650e4f: Bundle codemirror and update packages
+- Updated dependencies [f8650e4f]
+  - @scalar/use-codemirror@0.8.2
+
+## 0.11.1
+
+### Patch Changes
+
+- Updated dependencies [b1f3cb49]
+  - @scalar/use-codemirror@0.8.1
+
+## 0.11.0
+
+### Minor Changes
+
+- 26340b12: feat: update components to support all basic http request methods
+
+### Patch Changes
+
+- Updated dependencies [612431b4]
+  - @scalar/use-codemirror@0.8.0
+
+## 0.10.2
+
+### Patch Changes
+
+- 6da73708: feat: handle application/zip responses in the API client
+- Updated dependencies [6da73708]
+  - @scalar/use-codemirror@0.7.22
+
+## 0.10.1
+
+### Patch Changes
+
+- Updated dependencies [cd7afa70]
+  - @scalar/use-codemirror@0.7.21
+
+## 0.10.0
+
+### Minor Changes
+
+- dccb83ab: feat: add default state for api client collapsed panels
+
+## 0.9.4
+
+### Patch Changes
+
+- Updated dependencies [3d712d74]
+  - @scalar/use-codemirror@0.7.20
+
+## 0.9.3
+
+### Patch Changes
+
+- Updated dependencies [75e1cdf8]
+  - @scalar/use-keyboard-event@0.5.8
+
 ## 0.9.2
 
 ### Patch Changes

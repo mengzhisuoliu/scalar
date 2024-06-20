@@ -2,6 +2,7 @@
  * Normalizes a URL by trimming it and adding http:// as the default prefix.
  */
 export const normalizeUrl = (url?: string) => {
+  // Force at least an empty string
   if (typeof url !== 'string') {
     console.warn(
       `[sendRequest] URL is not a string. Using an empty string as the default.`,
@@ -10,15 +11,17 @@ export const normalizeUrl = (url?: string) => {
     return ''
   }
 
-  let normalizedUrl = url.trim().toLowerCase()
+  let sanitizedUrl = url
 
-  if (!normalizedUrl.startsWith('http')) {
+  // Force http:// as the default prefix
+  if (!sanitizedUrl.startsWith('http')) {
     console.warn(
       `[sendRequest] URL does not start with http. Adding http:// as the default prefix.`,
     )
 
-    normalizedUrl = `http://${normalizedUrl}`
+    sanitizedUrl = `http://${sanitizedUrl}`
   }
 
-  return normalizedUrl
+  // Remove whitespace
+  return sanitizedUrl.trim()
 }

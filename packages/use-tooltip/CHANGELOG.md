@@ -1,5 +1,80 @@
 # @scalar/use-tooltip
 
+## 0.7.3
+
+### Patch Changes
+
+- a2cb3c3: Migrate away from unintended peer dependencies
+
+## 0.7.2
+
+### Patch Changes
+
+- c65697c: fix: move tippy to dependencies
+
+## 0.7.1
+
+### Patch Changes
+
+- e0fc110: chore: patch bump all package
+
+## 0.7.0
+
+### Minor Changes
+
+- 7f8ef74: chore: remove aliasing
+
+### Patch Changes
+
+- b38c7ed: Update build configs to a standardized format
+- 6fbb57e: feat: release all the packages
+
+## 0.6.2
+
+### Patch Changes
+
+- 45dc04b: fix: can’t release packages
+
+## 0.6.1
+
+### Patch Changes
+
+- 05e2e27: chore: add provenance statement
+
+## 0.6.0
+
+### Minor Changes
+
+- 0e64a36: refactor: rename all --theme-_ variables to --scalar-_
+
+### Patch Changes
+
+- 22f2858: chore: ran syncpack to update packages
+
+## 0.5.12
+
+### Patch Changes
+
+- ef3a015: chore: update to typescript 5.4
+
+## 0.5.11
+
+### Patch Changes
+
+- 1669b27: chore: update dependencies
+
+## 0.5.10
+
+### Patch Changes
+
+- c6b95ca: chore: upgrade from Vite 4 to Vite 5
+
+## 0.5.9
+
+### Patch Changes
+
+- 92a8b9f: chore: update dependencies
+
 ## 0.5.8
 
 ### Patch Changes

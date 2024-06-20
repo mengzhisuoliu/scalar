@@ -28,23 +28,22 @@ const { breadcrumb } = useSidebar()
 </template>
 <style scoped>
 .references-mobile-header {
-  display: flex;
+  display: none;
   align-items: center;
   gap: 12px;
   height: 100%;
   width: 100%;
   padding: 0 8px;
-  background: var(--theme-background-1, var(--default-theme-background-1));
-  border-bottom: 1px solid
-    var(--theme-border-color, var(--default-theme-border-color));
+  background: var(--scalar-background-1);
+  border-bottom: 1px solid var(--scalar-border-color);
 }
 
 .references-mobile-breadcrumbs {
   flex: 1;
   min-width: 0;
-  font-size: var(--theme-small, var(--default-theme-small));
-  font-weight: var(--theme-semibold, var(--default-theme-semibold));
-  color: var(--theme-color-1, var(--default-theme-color-1));
+  font-size: var(--scalar-small);
+  font-weight: var(--scalar-semibold);
+  color: var(--scalar-color-1);
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
@@ -57,5 +56,11 @@ const { breadcrumb } = useSidebar()
   height: 24px;
   align-items: center;
   padding-left: 4px;
+}
+
+@media (max-width: 1000px) {
+  .references-mobile-header {
+    display: flex;
+  }
 }
 </style>

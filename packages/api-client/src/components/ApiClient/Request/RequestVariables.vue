@@ -1,6 +1,7 @@
 <script setup lang="ts">
+import type { BaseParameter } from '@scalar/oas-utils'
+
 import { useRequestStore } from '../../../stores'
-import type { BaseParameter } from '../../../types'
 import { CollapsibleSection } from '../../CollapsibleSection'
 import { Grid } from '../../Grid'
 
@@ -21,7 +22,9 @@ function addAnotherHandler() {
 }
 </script>
 <template>
-  <CollapsibleSection title="Variables">
+  <CollapsibleSection
+    :defaultOpen="activeRequest.variables && activeRequest.variables.length > 0"
+    title="Variables">
     <template v-if="!variables || variables.length === 0">
       <div class="scalar-api-client__empty-state">
         <button
@@ -40,7 +43,7 @@ function addAnotherHandler() {
               stroke="currentColor"
               stroke-linecap="round"
               stroke-linejoin="round"
-              stroke-width="3.429"
+              stroke-width="5"
               xmlns="http://www.w3.org/2000/svg"></path>
           </svg>
           Variable
@@ -51,6 +54,7 @@ function addAnotherHandler() {
       <Grid
         addLabel="Variable"
         :items="variables"
+        :showMoreFilter="true"
         @addAnother="addAnotherHandler"
         @deleteIndex="handleDeleteIndex" />
     </template>

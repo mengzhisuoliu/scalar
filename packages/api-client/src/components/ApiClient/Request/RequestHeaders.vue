@@ -1,9 +1,16 @@
 <script setup lang="ts">
+import type { BaseParameter } from '@scalar/oas-utils'
+import { computed } from 'vue'
+
 import { useRequestStore } from '../../../stores'
+import type { GeneratedParameter } from '../../../types'
 import { CollapsibleSection } from '../../CollapsibleSection'
 import { Grid } from '../../Grid'
 
-defineProps<{ headers?: any[] }>()
+const props = defineProps<{
+  headers?: BaseParameter[]
+  generatedHeaders?: GeneratedParameter[]
+}>()
 
 const { activeRequest } = useRequestStore()
 
@@ -18,10 +25,16 @@ function addAnotherHandler() {
 
   activeRequest.headers?.push({ name: '', value: '', enabled: true })
 }
+
+const hasHeaders = computed(() => {
+  return !!(props.headers?.length || props.generatedHeaders?.length)
+})
 </script>
 <template>
-  <CollapsibleSection title="Headers">
-    <template v-if="!headers || headers.length === 0">
+  <CollapsibleSection
+    :defaultOpen="hasHeaders"
+    title="Headers">
+    <template v-if="!hasHeaders">
       <div class="scalar-api-client__empty-state">
         <button
           class="scalar-api-client-add"
@@ -39,7 +52,7 @@ function addAnotherHandler() {
               stroke="currentColor"
               stroke-linecap="round"
               stroke-linejoin="round"
-              stroke-width="3.429"
+              stroke-width="5"
               xmlns="http://www.w3.org/2000/svg"></path>
           </svg>
           Headers
@@ -49,37 +62,10 @@ function addAnotherHandler() {
     <template v-else>
       <Grid
         addLabel="Header"
+        :generatedItems="generatedHeaders"
         :items="headers"
         @addAnother="addAnotherHandler"
         @deleteIndex="handleDeleteIndex" />
     </template>
   </CollapsibleSection>
 </template>
-<style>
-.scalar-api-client-add {
-  color: var(--theme-color-2, var(--default-theme-color-2));
-  padding: 6px;
-  width: fit-content;
-  border-radius: var(--theme-radius, var(--default-theme-radius));
-  cursor: pointer;
-  font-size: var(--theme-micro, var(--default-theme-micro));
-  font-weight: var(--theme-semibold, var(--default-theme-semibold));
-  margin: 0 6px;
-  border: none;
-  font-family: var(--theme-font);
-  appearance: none;
-  display: flex;
-  align-items: center;
-}
-.scalar-api-client-add svg {
-  width: 12px;
-  height: 12px;
-  margin-right: 6px;
-}
-.scalar-api-client-add:hover {
-  color: var(--theme-color-1, var(--default-theme-color-1));
-}
-.scalar-api-client-add:focus-within {
-  background: var(--theme-background-3, var(--default-theme-background-3));
-}
-</style>

@@ -1,5 +1,375 @@
 # @scalar/fastify-api-reference
 
+## 1.24.15
+
+## 1.24.14
+
+## 1.24.13
+
+## 1.24.12
+
+## 1.24.11
+
+## 1.24.10
+
+## 1.24.9
+
+## 1.24.8
+
+## 1.24.7
+
+## 1.24.6
+
+## 1.24.5
+
+## 1.24.4
+
+## 1.24.3
+
+### Patch Changes
+
+- e0fc110: chore: patch bump all package
+
+## 1.24.0
+
+### Minor Changes
+
+- 7f8ef74: chore: remove aliasing
+
+### Patch Changes
+
+- 6fbb57e: feat: release all the packages
+
+## 1.23.5
+
+## 1.23.4
+
+### Patch Changes
+
+- db7864a: feat: self host fonts on scalar cdn
+
+## 1.23.3
+
+## 1.23.2
+
+## 1.23.1
+
+## 1.23.0
+
+## 1.22.56
+
+## 1.22.55
+
+## 1.22.54
+
+## 1.22.53
+
+## 1.22.52
+
+## 1.22.51
+
+## 1.22.50
+
+## 1.22.49
+
+## 1.22.48
+
+## 1.22.47
+
+## 1.22.46
+
+## 1.22.45
+
+## 1.22.44
+
+## 1.22.43
+
+## 1.22.42
+
+## 1.22.41
+
+## 1.22.40
+
+## 1.22.39
+
+## 1.22.38
+
+## 1.22.37
+
+## 1.22.36
+
+## 1.22.35
+
+## 1.22.34
+
+## 1.22.33
+
+## 1.22.32
+
+## 1.22.31
+
+## 1.22.30
+
+## 1.22.29
+
+## 1.22.28
+
+## 1.22.27
+
+## 1.22.26
+
+### Patch Changes
+
+- 670156e: chore: bump packages
+
+## 1.22.25
+
+## 1.22.24
+
+### Patch Changes
+
+- 45dc04b: fix: can’t release packages
+
+## 1.22.23
+
+### Patch Changes
+
+- 05e2e27: chore: add provenance statement
+
+## 1.22.22
+
+## 1.22.21
+
+### Patch Changes
+
+- 07211ad: chore: added new lint rule for type importing for better perf
+
+## 1.22.20
+
+### Patch Changes
+
+- 9201802: chore: update example page title
+
+## 1.22.3
+
+### Patch Changes
+
+- 85a0074: fix: hotfix integration fonts
+
+## 1.22.2
+
+### Patch Changes
+
+- d77acdd: fix: missing css font
+
+## 1.22.0
+
+### Minor Changes
+
+- 0e64a36: refactor: rename all --theme-_ variables to --scalar-_
+
+### Patch Changes
+
+- 22f2858: chore: ran syncpack to update packages
+
+## 1.21.0
+
+### Minor Changes
+
+- b58b83e: Improved fastify-api-reference plugin.
+
+## 1.20.27
+
+### Patch Changes
+
+- 605f522: feat: support tags with no operations
+
+## 1.20.26
+
+### Patch Changes
+
+- 050410a: feat: add config to hide download button
+
+## 1.20.25
+
+### Patch Changes
+
+- 1504d3b: feat: add config to hide models
+
+## 1.20.22
+
+### Patch Changes
+
+- 4089634: feat: support x-displayName tag extension
+
+## 1.20.20
+
+### Patch Changes
+
+- c14568f: feat: add custom security option
+
+## 1.20.19
+
+### Patch Changes
+
+- ed44d47: manual fastify release
+
+## 1.20.10
+
+### Patch Changes
+
+- bec8e52: fix: add models to tag groups
+
+## 1.20.9
+
+### Patch Changes
+
+- 5260d07: feat: description for any
+
+## 1.20.5
+
+### Patch Changes
+
+- 0c5e22c: fix: section flare if position fixed
+
+## 1.20.2
+
+### Patch Changes
+
+- b32f46c: chore: update @scalar/api-reference
+
+## 1.19.5
+
+### Patch Changes
+
+- 00abdc5: chore: remove body margin reset everywhere, it’s not needed anymore
+- e520363: feat: added oauth2 implicit login flow
+
+## 1.19.4
+
+### Patch Changes
+
+- c987a90: fix: add min height to classic layout
+
+## 1.19.3
+
+### Patch Changes
+
+- 21195b7: fix: add back sidebar item hover color
+- 68cda2b: feat: add x-tagGroups in sidebar
+
+## 1.19.2
+
+### Patch Changes
+
+- a292ccb: fix: mobile backgrounds for mars and blueplanet
+
+## 1.19.1
+
+### Patch Changes
+
+- 148966b: fix: move errors into warning from new parser
+
+## 1.19.0
+
+### Minor Changes
+
+- 7fb8273: Migrate to @scalar/openapi-parser
+
+## 1.18.7
+
+### Patch Changes
+
+- cecf074: Migrate to oas utils for basic spec operations
+
+## 1.18.5
+
+### Patch Changes
+
+- 5cf4afa: style: replace resize observer with css container queries
+
+## 1.18.2
+
+### Patch Changes
+
+- ef3a015: chore: update to typescript 5.4
+
+## 1.17.15
+
+### Patch Changes
+
+- 3b672cc: fix: revert css changes to components lib
+
+## 1.17.14
+
+### Patch Changes
+
+- fd0af3c: fix: mobile header button
+
+## 1.17.13
+
+### Patch Changes
+
+- 5bf377e: fix: visual regressions
+
+## 1.17.12
+
+### Patch Changes
+
+- 5bc2ebf: Add syntax highlighting back to codemirror
+
+## 1.17.6
+
+### Patch Changes
+
+- ca7cced: fix: \_\_dirname undefined (again)
+
+## 1.17.5
+
+### Patch Changes
+
+- d78e247: fix: ESM envs \_\_dirname is undefined
+
+## 1.17.3
+
+### Patch Changes
+
+- 1669b27: chore: update dependencies
+
+## 1.17.2
+
+### Patch Changes
+
+- c6b95ca: chore: upgrade from Vite 4 to Vite 5
+
+## 1.16.0
+
+### Minor Changes
+
+- e0faebb: feat: add show more button to request variables and path params
+
+### Patch Changes
+
+- 92a8b9f: chore: update dependencies
+
+## 1.15.5
+
+### Patch Changes
+
+- 04d0fe12: fix: rollback api client proxy and request changes
+
+## 1.14.8
+
+### Patch Changes
+
+- d7dbba87: fix: css reset on markdown details summary
+
+## 1.13.18
+
+### Patch Changes
+
+- b4f66f0b: fix: example spec not loading on mobile
+
 ## 1.13.13
 
 ### Patch Changes

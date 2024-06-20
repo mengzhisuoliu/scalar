@@ -1,32 +1,31 @@
-import { validRequestMethods } from '../fixtures'
+import type { RequestMethod } from '@scalar/oas-utils/helpers'
 
-const defaultRequestMethod = 'GET'
+import { isRequestMethod } from '../fixtures'
+
+const DEFAULT_REQUEST_METHOD = 'GET'
 
 /**
  * Get a normalized request method (e.g. GET, POST, etc.)
  */
-export const normalizeRequestMethod = (method?: string) => {
+export const normalizeRequestMethod = (method?: string): RequestMethod => {
   // Make sure it’s a string
   if (typeof method !== 'string') {
     console.warn(
-      `[sendRequest] Request method is not a string. Using ${defaultRequestMethod} as the default.`,
+      `Request method is not a string. Using ${DEFAULT_REQUEST_METHOD} as the default.`,
     )
 
-    return defaultRequestMethod
+    return DEFAULT_REQUEST_METHOD
   }
 
   // Normalize the string
   const normalizedMethod = method.trim().toUpperCase()
 
-  // Make sure it’s a valid request method
-  const isValidRequestMethod = validRequestMethods.includes(normalizedMethod)
-
-  if (!isValidRequestMethod) {
+  if (!isRequestMethod(normalizedMethod)) {
     console.warn(
-      `[sendRequest] ${method} is not a valid request method. Using ${defaultRequestMethod} as the default.`,
+      `${method} is not a valid request method. Using ${DEFAULT_REQUEST_METHOD} as the default.`,
     )
 
-    return defaultRequestMethod
+    return DEFAULT_REQUEST_METHOD
   }
 
   return normalizedMethod

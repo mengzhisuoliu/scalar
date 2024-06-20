@@ -1,7 +1,9 @@
 <script setup lang="ts">
+import type { Spec } from '@scalar/oas-utils'
+import type { OpenAPIV2, OpenAPIV3, OpenAPIV3_1 } from '@scalar/openapi-parser'
+import GithubSlugger from 'github-slugger'
 import { computed } from 'vue'
 
-import type { Info, Spec } from '../../../types'
 import { Badge } from '../../Badge'
 import {
   Section,
@@ -15,28 +17,24 @@ import Description from './Description.vue'
 import DownloadSpec from './DownloadSpec.vue'
 
 const props = defineProps<{
-  info: Info
+  info: Partial<
+    OpenAPIV2.InfoObject | OpenAPIV3.InfoObject | OpenAPIV3_1.InfoObject
+  >
   parsedSpec: Spec
-  rawSpec: string
 }>()
+
+const slugger = new GithubSlugger()
 
 const specVersion = computed(() => {
   return props.parsedSpec.openapi ?? props.parsedSpec.swagger ?? ''
 })
+
+const formattedSpecTitle = computed(() => {
+  return slugger.slug(props.info.title ?? '')
+})
 </script>
 <template>
   <SectionContainer>
-    <!-- For adding gradients + animations to introduction of documents that :before / :after won't work for -->
-    <div class="section-flare">
-      <div class="section-flare-item"></div>
-      <div class="section-flare-item"></div>
-      <div class="section-flare-item"></div>
-      <div class="section-flare-item"></div>
-      <div class="section-flare-item"></div>
-      <div class="section-flare-item"></div>
-      <div class="section-flare-item"></div>
-      <div class="section-flare-item"></div>
-    </div>
     <Section class="introduction-section">
       <SectionContent :loading="!info.description && !info.title">
         <SectionColumns>
@@ -53,7 +51,7 @@ const specVersion = computed(() => {
               tight>
               {{ info.title }}
             </SectionHeader>
-            <DownloadSpec :value="rawSpec" />
+            <DownloadSpec :specTitle="formattedSpecTitle" />
             <Description :value="info.description" />
           </SectionColumn>
           <SectionColumn v-if="$slots.aside">
@@ -73,9 +71,9 @@ const specVersion = computed(() => {
   word-wrap: break-word;
 }
 .loading {
-  background: var(--theme-background-3, var(--default-theme-background-3));
+  background: var(--scalar-background-3);
   animation: loading-skeleton 1.5s infinite alternate;
-  border-radius: var(--theme-radius-lg, var(--default-theme-radius-lg));
+  border-radius: var(--scalar-radius-lg);
 }
 .badges {
   display: flex;
@@ -95,11 +93,5 @@ const specVersion = computed(() => {
 
   position: sticky;
   top: calc(var(--refs-header-height) + 24px);
-}
-.section-flare {
-  position: absolute;
-  top: 0;
-  right: 0;
-  pointer-events: none;
 }
 </style>

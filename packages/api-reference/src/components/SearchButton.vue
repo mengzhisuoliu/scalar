@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { ScalarIcon } from '@scalar/components'
-import { useKeyboardEvent } from '@scalar/use-keyboard-event'
-import { useModal } from '@scalar/use-modal'
+import { ScalarIcon, useModal } from '@scalar/components'
+import type { Spec } from '@scalar/oas-utils'
 import { isMacOS } from '@scalar/use-tooltip'
+import { useMagicKeys, whenever } from '@vueuse/core'
+import { onMounted, ref } from 'vue'
 
-import { useActive } from '../hooks/useActive'
-import { type Spec } from '../types'
 import SearchModal from './SearchModal.vue'
+import { modalStateBus } from './api-client-bus'
 
 const props = withDefaults(
   defineProps<{
@@ -18,16 +18,34 @@ const props = withDefaults(
   },
 )
 
-const { isActive } = useActive()
-
 const modalState = useModal()
+const apiClientModalState = ref<{ open: boolean } | null>(null)
 
-useKeyboardEvent({
-  keyList: [props.searchHotKey],
-  withCtrlCmd: true,
-  handler: () => (modalState.open ? modalState.hide() : modalState.show()),
-  active: () => isActive.value,
+const keys = useMagicKeys({
+  passive: false,
+  onEventFired(e) {
+    // Remove default behaviour for keypress
+    if (!isMacOS() && e.ctrlKey && e.key === props.searchHotKey) {
+      e.preventDefault()
+      e.stopPropagation()
+    }
+  },
 })
+
+onMounted(() => {
+  modalStateBus.on((state: unknown) => {
+    apiClientModalState.value = state as { open: boolean } | null
+  })
+})
+
+whenever(
+  keys[`${isMacOS() ? 'meta' : 'control'}_${props.searchHotKey}`],
+  () => {
+    if (!apiClientModalState.value?.open) {
+      modalState.open ? modalState.hide() : modalState.show()
+    }
+  },
+)
 </script>
 <template>
   <button
@@ -37,13 +55,10 @@ useKeyboardEvent({
     @click="modalState.show">
     <ScalarIcon
       class="search-icon"
-      icon="Search" />
+      icon="Search"
+      size="sm" />
     <div class="sidebar-search-input">
-      <span
-        class="sidebar-search-placeholder"
-        type="text">
-        Search
-      </span>
+      <span class="sidebar-search-placeholder">Search</span>
       <span class="sidebar-search-shortcut">
         <span class="sidebar-search-key">
           {{ isMacOS() ? '⌘' : '⌃' }}{{ searchHotKey }}
@@ -60,34 +75,19 @@ useKeyboardEvent({
   display: flex;
   align-items: center;
   position: relative;
-  padding: 0 3px 0 12px;
-  min-width: 224px;
+  padding: 0 3px 0 9px;
+  min-width: 254px;
   max-width: 100%;
-  font-family: var(--theme-font, var(--default-theme-font));
+  font-family: var(--scalar-font);
   background: var(
-    --sidebar-search-background,
-    var(
-      --default-sidebar-search-background,
-      var(--theme-background-1, var(--default-theme-background-1))
-    )
+    --scalar-sidebar-search-background,
+    var(--scalar-background-1)
   );
-  color: var(
-    --sidebar-color-2,
-    var(
-      --default-sidebar-color-2,
-      var(--theme-color-2, var(--default-theme-color-2))
-    )
-  );
+  color: var(--scalar-sidebar-color-2, var(--scalar-color-2));
   outline: none;
-  border-radius: var(--theme-radius, var(--default-theme-radius));
+  border-radius: var(--scalar-radius);
   box-shadow: 0 0 0 1px
-    var(
-      --sidebar-search-border-color,
-      var(
-        --default-sidebar-search-border-color,
-        var(--theme-border-color, var(--default-theme-border-color))
-      )
-    );
+    var(--scalar-sidebar-search-border-color, var(--scalar-border-color));
   /* prettier-ignore */
   cursor: pointer;
   appearance: none;
@@ -95,8 +95,8 @@ useKeyboardEvent({
 }
 
 .sidebar-search-input {
-  font-size: var(--theme-mini, var(--default-theme-mini));
-  font-weight: var(--theme-semibold, var(--default-theme-semibold));
+  font-size: var(--scalar-mini);
+  font-weight: var(--scalar-semibold);
   height: 31px;
 
   user-select: none;
@@ -111,23 +111,16 @@ useKeyboardEvent({
   text-transform: uppercase;
 }
 .sidebar-search-key {
-  background-color: var(
-    --theme-background-2,
-    var(--default-theme-background-2)
-  );
+  background-color: var(--scalar-background-2);
   padding: 3px 5px;
   margin: 2px;
-  border-radius: var(--theme-radius, var(--default-theme-radius));
-  color: var(
-    --sidebar-color-2,
-    var(--default-sidebar-color-2),
-    var(--theme-color-2, var(--default-theme-color-2))
-  );
+  border-radius: var(--scalar-radius);
+  color: var(--scalar-sidebar-color-2, var(--scalar-color-2));
 }
 
 .search-icon {
   padding: 0;
-  margin-right: 9px;
+  margin-right: 6px;
   width: 12px;
 }
 </style>

@@ -1,131 +1,175 @@
 <script setup lang="ts">
-import { useResizeObserver } from '@vueuse/core'
-import { computed, ref } from 'vue'
+import { type Server, useServerStore } from '@scalar/api-client'
+import type { Spec } from '@scalar/oas-utils'
+import { computed, watch } from 'vue'
 
-import { hasModels, hasWebhooks } from '../../helpers'
-import { useRefOnMount } from '../../hooks'
-import type { Spec } from '../../types'
+import { getModels, hasModels } from '../../helpers'
+import { useNavState, useSidebar } from '../../hooks'
 import { Authentication } from './Authentication'
-import Introduction from './Introduction'
-import ClientList from './Introduction/ClientList.vue'
-import ServerList from './Introduction/ServerList.vue'
-import Models from './Models.vue'
-import ModelsAccordion from './ModelsAccordion.vue'
-import ReferenceEndpoint from './ReferenceEndpoint'
-import ReferenceEndpointAccordion from './ReferenceEndpoint/ReferenceEndpointAccordion.vue'
-import ReferenceTag from './ReferenceTag.vue'
-import ReferenceTagAccordion from './ReferenceTagAccordion.vue'
-import Webhooks from './Webhooks.vue'
+import { BaseUrl } from './BaseUrl'
+import { ClientLibraries } from './ClientLibraries'
+import { Introduction } from './Introduction'
+import { Lazy, Loading } from './Lazy'
+import { Models, ModelsAccordion } from './Models'
+import { Operation, OperationAccordion } from './Operation'
+import { Tag, TagAccordion } from './Tag'
+import { Webhooks } from './Webhooks'
 
 const props = defineProps<{
   parsedSpec: Spec
-  rawSpec: string
   layout?: 'default' | 'accordion'
+  baseServerURL?: string
+  proxy?: string
+  servers?: Server[]
 }>()
 
-const referenceEl = ref<HTMLElement | null>(null)
-const isNarrow = ref(true)
+const { getOperationId, getTagId, hash } = useNavState()
+const { setServer } = useServerStore()
+const { hideModels, collapsedSidebarItems } = useSidebar()
 
-useResizeObserver(
-  referenceEl,
-  (entries) => (isNarrow.value = entries[0].contentRect.width < 900),
-)
+const prependRelativePath = (server: Server) => {
+  // URLs that don't start with http[s]:// or a variable
+  if (server.url.match(/^(?!(https?|file):\/\/|{).+/)) {
+    let baseURL = props.baseServerURL ?? window.location.origin
 
-const fallBackServer = useRefOnMount(() => {
-  return {
-    url: window.location.origin,
+    // Handle slashes
+    baseURL = baseURL.replace(/\/$/, '')
+    const url = server.url.startsWith('/') ? server.url : `/${server.url}`
+    server.url = `${baseURL}${url}`.replace(/\/$/, '')
   }
-})
+  return server
+}
 
-const localServers = computed(() => {
-  if (props.parsedSpec.servers && props.parsedSpec.servers.length > 0) {
-    return props.parsedSpec.servers
-  } else if (
-    props.parsedSpec.host &&
-    props.parsedSpec.schemes &&
-    props.parsedSpec.schemes.length > 0
-  ) {
-    return [
-      {
-        url: `${props.parsedSpec.schemes[0]}://${props.parsedSpec.host}${
-          props.parsedSpec?.basePath ?? ''
-        }`,
-      },
+// Watch the spec and set the servers
+watch(
+  () => props.parsedSpec,
+  (parsedSpec) => {
+    let servers = [
+      { url: typeof window !== 'undefined' ? window.location.origin : '/' },
     ]
-  } else if (fallBackServer.value) {
-    return [fallBackServer.value]
-  } else {
-    return [{ url: '' }]
-  }
-})
 
-const tagLayout = computed<typeof ReferenceTag>(() =>
-  props.layout === 'accordion' ? ReferenceTagAccordion : ReferenceTag,
+    if (props.servers) {
+      servers = props.servers
+    } else if (parsedSpec.servers && parsedSpec.servers.length > 0) {
+      servers = parsedSpec.servers
+    } else if (props.parsedSpec.host) {
+      // Use the first scheme if available, otherwise default to http
+      const scheme = props.parsedSpec.schemes?.[0] ?? 'http'
+
+      servers = [
+        {
+          url: `${scheme}://${props.parsedSpec.host}${
+            props.parsedSpec?.basePath ?? ''
+          }`,
+        },
+      ]
+    }
+
+    // Pre-pend relative paths (if we can)
+    if (props.baseServerURL || typeof window !== 'undefined') {
+      servers = servers.map(prependRelativePath)
+    }
+
+    setServer({ servers })
+  },
+  { deep: true, immediate: true },
 )
-const endpointLayout = computed<typeof ReferenceEndpoint>(() =>
-  props.layout === 'accordion' ? ReferenceEndpointAccordion : ReferenceEndpoint,
+const tagLayout = computed<typeof Tag>(() =>
+  props.layout === 'accordion' ? TagAccordion : Tag,
+)
+const endpointLayout = computed<typeof Operation>(() =>
+  props.layout === 'accordion' ? OperationAccordion : Operation,
 )
 const introCardsSlot = computed(() =>
   props.layout === 'accordion' ? 'after' : 'aside',
 )
+
+// If the first load is models, we do not lazy load tags/operations
+const isLazy = props.layout !== 'accordion' && !hash.value.startsWith('model')
 </script>
 <template>
-  <div
-    ref="referenceEl"
-    :class="{
-      'references-narrow': isNarrow,
-    }">
+  <!-- For adding gradients + animations to introduction of documents that :before / :after won't work for -->
+  <div class="section-flare">
+    <div class="section-flare-item"></div>
+    <div class="section-flare-item"></div>
+    <div class="section-flare-item"></div>
+    <div class="section-flare-item"></div>
+    <div class="section-flare-item"></div>
+    <div class="section-flare-item"></div>
+    <div class="section-flare-item"></div>
+    <div class="section-flare-item"></div>
+  </div>
+  <div class="narrow-references-container">
     <slot name="start" />
+    <Loading
+      :layout="layout"
+      :parsedSpec="parsedSpec" />
+
     <Introduction
-      v-if="parsedSpec.info.title || parsedSpec.info.description"
+      v-if="parsedSpec?.info?.title || parsedSpec?.info?.description"
       :info="parsedSpec.info"
-      :parsedSpec="parsedSpec"
-      :rawSpec="rawSpec">
+      :parsedSpec="parsedSpec">
       <template #[introCardsSlot]>
         <div
-          class="introduction-cards"
-          :class="{ 'introduction-cards-row': layout === 'accordion' }">
-          <ServerList :value="localServers" />
-          <ClientList />
-          <Authentication :parsedSpec="parsedSpec" />
+          class="introduction-card"
+          :class="{ 'introduction-card-row': layout === 'accordion' }">
+          <BaseUrl />
+          <Authentication
+            :parsedSpec="parsedSpec"
+            :proxy="proxy" />
+          <ClientLibraries />
         </div>
       </template>
     </Introduction>
     <slot
       v-else
       name="empty-state" />
-    <template
-      v-for="(tag, index) in parsedSpec.tags"
-      :key="tag.id">
+
+    <Lazy
+      v-for="tag in parsedSpec.tags"
+      :id="getTagId(tag)"
+      :key="getTagId(tag)"
+      :isLazy="isLazy && !collapsedSidebarItems[getTagId(tag)]">
       <Component
         :is="tagLayout"
-        v-if="tag.operations && tag.operations.length > 0"
-        :isFirst="index === 0"
+        :id="getTagId(tag)"
         :spec="parsedSpec"
         :tag="tag">
-        <Component
-          :is="endpointLayout"
-          v-for="operation in tag.operations"
+        <Lazy
+          v-for="(operation, operationIndex) in tag.operations"
+          :id="getOperationId(operation, tag)"
           :key="`${operation.httpVerb}-${operation.operationId}`"
-          :operation="operation"
-          :server="localServers[0]"
-          :tag="tag" />
+          :isLazy="operationIndex > 0">
+          <Component
+            :is="endpointLayout"
+            :id="getOperationId(operation, tag)"
+            :operation="operation"
+            :tag="tag" />
+        </Lazy>
       </Component>
-    </template>
+    </Lazy>
+
     <template v-if="parsedSpec.webhooks">
       <Webhooks :webhooks="parsedSpec.webhooks" />
     </template>
-    <template v-if="hasModels(parsedSpec)">
+
+    <template v-if="hasModels(parsedSpec) && !hideModels">
       <ModelsAccordion
         v-if="layout === 'accordion'"
-        :components="parsedSpec.components" />
+        :schemas="getModels(parsedSpec)" />
       <Models
         v-else
-        :components="parsedSpec.components" />
+        :schemas="getModels(parsedSpec)" />
     </template>
     <slot name="end" />
   </div>
 </template>
+<style>
+.narrow-references-container {
+  container-name: narrow-references-container;
+  container-type: inline-size;
+}
+</style>
 <style scoped>
 .render-loading {
   height: calc(var(--full-height) - var(--refs-header-height));
@@ -133,41 +177,75 @@ const introCardsSlot = computed(() =>
   align-items: center;
   justify-content: center;
 }
-.introduction-cards {
+.introduction-card {
   display: flex;
   flex-direction: column;
   gap: 12px;
+  padding: 12px 12px 0 12px;
+  background: var(--scalar-background-1);
+  border: 1px solid var(--scalar-border-color);
+  border-radius: var(--scalar-radius-lg);
 }
-.introduction-cards-row {
-  flex-direction: row;
+.introduction-card-title {
+  font-weight: var(--scalar-semibold);
+  font-size: var(--scalar-mini);
+  color: var(--scalar-color-3);
+}
+.introduction-card-row {
+  flex-flow: row wrap;
   gap: 24px;
-  --default-theme-background-2: var(--default-theme-background-1);
-  --theme-background-2: var(--theme-background-1);
 }
-.introduction-cards-row > * {
+.introduction-card-row > * {
   flex: 1;
 }
-.references-narrow .introduction-cards-row {
-  flex-direction: column;
-  align-items: stretch;
+@media (min-width: 600px) {
+  .introduction-card-row > * {
+    min-width: min-content;
+  }
+}
+@media (max-width: 600px) {
+  .introduction-card-row > * {
+    max-width: 100%;
+  }
+}
+@container (max-width: 900px) {
+  .introduction-card-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+.introduction-card :deep(.security-scheme-label) {
+  text-transform: uppercase;
+  font-weight: var(--scalar-semibold);
+}
+.references-classic .introduction-card-row :deep(.card-footer),
+.references-classic .introduction-card-row :deep(.scalar-card),
+.references-classic .introduction-card-row :deep(.scalar-card--muted) {
+  background: var(--scalar-background-1);
 }
 .references-classic
-  .introduction-cards-row
+  .introduction-card-row
   :deep(.scalar-card:nth-of-type(2) .scalar-card-header) {
   display: none;
 }
 .references-classic
-  .introduction-cards-row
+  .introduction-card-row
   :deep(.scalar-card:nth-of-type(2) .scalar-card-header) {
   display: none;
 }
 .references-classic
-  .introduction-cards-row
+  .introduction-card-row
   :deep(
     .scalar-card:nth-of-type(2)
       .scalar-card-header.scalar-card--borderless
       + .scalar-card-content
   ) {
   margin-top: 0;
+}
+.section-flare {
+  position: absolute;
+  top: 0;
+  right: 0;
+  pointer-events: none;
 }
 </style>

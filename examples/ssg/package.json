@@ -17,13 +17,14 @@
   "type": "module",
   "dependencies": {
     "@scalar/api-reference": "workspace:*",
-    "vue": "^3.3.0"
+    "@scalar/oas-utils": "workspace:*",
+    "vue": "^3.4.22"
   },
   "devDependencies": {
-    "@vitejs/plugin-vue": "^4.4.0",
-    "typescript": "^5.2.2",
-    "vite": "^4.5.2",
-    "vite-ssg": "^0.23.4",
-    "vue-tsc": "^1.8.19"
+    "@vitejs/plugin-vue": "^5.0.4",
+    "typescript": "^5.4.3",
+    "vite": "^5.2.10",
+    "vite-ssg": "^0.23.6",
+    "vue-tsc": "^2.0.13"
   }
 }

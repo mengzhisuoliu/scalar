@@ -1,47 +1,59 @@
-import { useApiClientStore } from '@scalar/api-client'
-import { objectEntries } from '@vueuse/core'
-import { type OpenAPIV3_1 } from 'openapi-types'
+import { useApiClientStore, useOpenApiStore } from '@scalar/api-client'
+import type { Spec, Tag, TransformedOperation } from '@scalar/oas-utils'
+import { ssrState } from '@scalar/oas-utils/helpers'
+import type { OpenAPIV3_1 } from '@scalar/openapi-parser'
 import { computed, reactive, ref, watch } from 'vue'
 
 import {
   getHeadingsFromMarkdown,
   getLowestHeadingLevel,
+  getModels,
   hasModels,
   hasWebhooks,
   openClientFor,
 } from '../helpers'
-import type { Spec, Tag, TransformedOperation } from '../types'
 import { useNavState } from './useNavState'
 
 export type SidebarEntry = {
   id: string
   title: string
+  displayTitle?: string
   children?: SidebarEntry[]
   select?: () => void
   httpVerb?: string
   show: boolean
   deprecated?: boolean
+  isGroup?: boolean
 }
 
 const {
   getHeadingId,
-  getWebhookId,
   getModelId,
   getOperationId,
+  getSectionId,
   getTagId,
+  getWebhookId,
   hash,
-} = useNavState(false)
+} = useNavState()
 
 // Track the parsed spec
 const parsedSpec = ref<Spec | undefined>(undefined)
 
+function setParsedSpec(spec: Spec) {
+  return (parsedSpec.value = spec)
+}
+
+const hideModels = ref(false)
+
 // Track which sidebar items are collapsed
 type CollapsedSidebarItems = Record<string, boolean>
 
-const collapsedSidebarItems = reactive<CollapsedSidebarItems>({})
+const collapsedSidebarItems = reactive<CollapsedSidebarItems>(
+  ssrState['useSidebarContent-collapsedSidebarItems'] ?? {},
+)
 
 function toggleCollapsedSidebarItem(key: string) {
-  collapsedSidebarItems[key] = !collapsedSidebarItems[key] ?? true
+  collapsedSidebarItems[key] = !collapsedSidebarItems[key]
 }
 
 function setCollapsedSidebarItem(key: string, value: boolean) {
@@ -55,7 +67,14 @@ const updateHeadings = async (description: string) => {
   const newHeadings = await getHeadingsFromMarkdown(description)
   const lowestLevel = getLowestHeadingLevel(newHeadings)
 
-  return newHeadings.filter((heading) => heading.depth === lowestLevel)
+  return newHeadings.filter((heading) => {
+    return (
+      // highest level, eg. # Introduction
+      heading.depth === lowestLevel ||
+      // second highest level, eg. ## Authentication
+      heading.depth === lowestLevel + 1
+    )
+  })
 }
 
 // Create the list of sidebar items from the given spec
@@ -63,13 +82,33 @@ const items = computed(() => {
   // Check whether the API client is visible
   const { state } = useApiClientStore()
   const titlesById: Record<string, string> = {}
+  const {
+    openApi: { globalSecurity },
+  } = useOpenApiStore()
 
-  // Introduction
-  const headingEntries: SidebarEntry[] = headings.value.map((heading) => {
-    return {
-      id: getHeadingId(heading),
-      title: heading.value.toUpperCase(),
-      show: !state.showApiClient,
+  // Headings from the OpenAPI description field
+  const headingEntries: SidebarEntry[] = []
+  let currentHeading: SidebarEntry | null = null
+
+  headings.value.forEach((heading) => {
+    // If the heading is the lowest level, create a new heading entry.
+    if (heading.depth === getLowestHeadingLevel(headings.value)) {
+      currentHeading = {
+        id: getHeadingId(heading),
+        title: heading.value,
+        show: !state.showApiClient,
+        children: [],
+      }
+
+      headingEntries.push(currentHeading)
+    }
+    // If the heading is the second lowest level, add it to the current heading entry.
+    else if (currentHeading) {
+      currentHeading.children?.push({
+        id: getHeadingId(heading),
+        title: heading.value,
+        show: !state.showApiClient,
+      })
     }
   })
 
@@ -83,34 +122,38 @@ const items = computed(() => {
     tags[0].description !== ''
 
   const operationEntries: SidebarEntry[] | undefined =
-    firstTag &&
-    moreThanOneDefaultTag(parsedSpec.value?.tags) &&
-    firstTag.operations?.length > 0
-      ? parsedSpec.value?.tags?.map((tag: Tag) => {
-          return {
-            id: getTagId(tag),
-            title: tag.name.toUpperCase(),
-            show: true,
-            children: tag.operations?.map((operation: TransformedOperation) => {
-              const id = getOperationId(operation, tag)
-              const title = operation.name ?? operation.path
-              titlesById[id] = title
+    firstTag && moreThanOneDefaultTag(parsedSpec.value?.tags)
+      ? parsedSpec.value?.tags
+          // Filter out tags without operations
+          ?.filter((tag: Tag) => tag.operations?.length > 0)
+          .map((tag: Tag) => {
+            return {
+              id: getTagId(tag),
+              title: tag.name,
+              displayTitle: tag['x-displayName'] ?? tag.name,
+              show: true,
+              children: tag.operations?.map(
+                (operation: TransformedOperation) => {
+                  const id = getOperationId(operation, tag)
+                  const title = operation.name ?? operation.path
+                  titlesById[id] = title
 
-              return {
-                id,
-                title,
-                httpVerb: operation.httpVerb,
-                deprecated: operation.information?.deprecated ?? false,
-                show: true,
-                select: () => {
-                  if (state.showApiClient) {
-                    openClientFor(operation)
+                  return {
+                    id,
+                    title,
+                    httpVerb: operation.httpVerb,
+                    deprecated: operation.information?.deprecated ?? false,
+                    show: true,
+                    select: () => {
+                      if (state.showApiClient) {
+                        openClientFor(operation, globalSecurity)
+                      }
+                    },
                   }
                 },
-              }
-            }),
-          }
-        })
+              ),
+            }
+          })
       : firstTag?.operations?.map((operation) => {
           const id = getOperationId(operation, firstTag)
           const title = operation.name ?? operation.path
@@ -124,18 +167,43 @@ const items = computed(() => {
             show: true,
             select: () => {
               if (state.showApiClient) {
-                openClientFor(operation)
+                openClientFor(operation, globalSecurity)
               }
             },
           }
         })
 
+  // Models
+  let modelEntries: SidebarEntry[] =
+    hasModels(parsedSpec.value) && !hideModels.value
+      ? [
+          {
+            id: getModelId(),
+            title: 'Models',
+            show: !state.showApiClient,
+            children: Object.keys(getModels(parsedSpec.value) ?? {}).map(
+              (name) => {
+                const id = getModelId(name)
+                titlesById[id] = name
+
+                return {
+                  id,
+                  title:
+                    (getModels(parsedSpec.value)?.[name] as any).title ?? name,
+                  show: !state.showApiClient,
+                }
+              },
+            ),
+          },
+        ]
+      : []
+
   // Webhooks
-  const webhookEntries: SidebarEntry[] = hasWebhooks(parsedSpec.value)
+  let webhookEntries: SidebarEntry[] = hasWebhooks(parsedSpec.value)
     ? [
         {
           id: getWebhookId(),
-          title: 'WEBHOOKS',
+          title: 'Webhook',
           show: !state.showApiClient,
           children: Object.keys(parsedSpec.value?.webhooks ?? {})
             .map((name) => {
@@ -160,35 +228,47 @@ const items = computed(() => {
       ]
     : []
 
-  // Models
-  const modelEntries: SidebarEntry[] = hasModels(parsedSpec.value)
-    ? [
-        {
-          id: getModelId(),
-          title: 'MODELS',
-          show: !state.showApiClient,
-          children: Object.keys(
-            parsedSpec.value?.components?.schemas ?? {},
-          ).map((name) => {
-            const id = getModelId(name)
-            titlesById[id] = name
+  const groupOperations: SidebarEntry[] | undefined = parsedSpec.value?.[
+    'x-tagGroups'
+  ]
+    ? parsedSpec.value?.['x-tagGroups']?.map((tagGroup) => {
+        const children: SidebarEntry[] = []
+        tagGroup.tags?.map((tagName: string) => {
+          if (tagName === 'models' && modelEntries.length > 0) {
+            // Add default models entry to the group
+            children.push(modelEntries[0])
+            // Don’t show default models entry
+            modelEntries = []
+          } else if (tagName === 'webhooks' && webhookEntries.length > 0) {
+            // Add default webhooks entry to the group
+            children.push(webhookEntries[0])
+            // Don’t show default webhooks entry
+            webhookEntries = []
+          } else {
+            const tag = operationEntries?.find(
+              (entry) => entry.title === tagName,
+            )
 
-            return {
-              id,
-              title:
-                (parsedSpec?.value?.components?.schemas?.[name] as any).title ??
-                name,
-              show: !state.showApiClient,
+            if (tag) {
+              children.push(tag)
             }
-          }),
-        },
-      ]
-    : []
+          }
+        })
+        const sidebarTagGroup = {
+          id: tagGroup.name,
+          title: tagGroup.name,
+          children,
+          show: true,
+          isGroup: true,
+        }
+        return sidebarTagGroup
+      })
+    : undefined
 
   return {
     entries: [
       ...headingEntries,
-      ...(operationEntries ?? []),
+      ...(groupOperations ?? operationEntries ?? []),
       ...webhookEntries,
       ...modelEntries,
     ],
@@ -196,23 +276,28 @@ const items = computed(() => {
   }
 })
 
+// Controls whether or not the sidebar is open on MOBILE only
+// Desktop uses the standard showSidebar prop which supercedes this one
+const isSidebarOpen = ref(false)
+
 const breadcrumb = computed(() => items.value?.titles?.[hash.value] ?? '')
 
 export function useSidebar(options?: { parsedSpec: Spec }) {
   if (options?.parsedSpec) {
     parsedSpec.value = options.parsedSpec
 
-    // Open the first tag section by default
+    // Open the first tag section by default OR specific section from hash
     watch(
-      parsedSpec,
+      () => parsedSpec.value?.tags?.length,
       () => {
-        const firstTag = parsedSpec.value?.tags?.[0]
-
-        if (firstTag) {
-          setCollapsedSidebarItem(getTagId(firstTag), true)
+        if (hash.value) {
+          const hashSectionId = getSectionId(hash.value)
+          if (hashSectionId) setCollapsedSidebarItem(hashSectionId, true)
+        } else {
+          const firstTag = parsedSpec.value?.tags?.[0]
+          if (firstTag) setCollapsedSidebarItem(getTagId(firstTag), true)
         }
       },
-      { immediate: true, deep: true },
     )
 
     // Watch the spec description for headings
@@ -222,7 +307,7 @@ export function useSidebar(options?: { parsedSpec: Spec }) {
         const description = parsedSpec.value?.info?.description
 
         if (!description) {
-          return []
+          return (headings.value = [])
         }
 
         return (headings.value = await updateHeadings(description))
@@ -233,8 +318,11 @@ export function useSidebar(options?: { parsedSpec: Spec }) {
   return {
     breadcrumb,
     items,
+    isSidebarOpen,
     collapsedSidebarItems,
     toggleCollapsedSidebarItem,
     setCollapsedSidebarItem,
+    hideModels,
+    setParsedSpec,
   }
 }

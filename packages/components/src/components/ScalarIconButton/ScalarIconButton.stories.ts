@@ -8,8 +8,8 @@ const meta = {
   tags: ['autodocs'],
   argTypes: {
     icon: { control: 'select', options: ICONS },
-    size: { control: 'select', options: ['xs', 'sm', 'md'] },
-    label: { control: 'string' },
+    size: { control: 'select', options: ['xxs', 'xs', 'sm', 'md'] },
+    label: { control: 'text' },
     variant: {
       control: 'select',
       options: ['solid', 'outlined', 'ghost', 'danger'],

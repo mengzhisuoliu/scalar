@@ -1,5 +1,166 @@
 # @scalar/use-codemirror
 
+## 0.11.2
+
+### Patch Changes
+
+- a2cb3c3: Migrate away from unintended peer dependencies
+
+## 0.11.1
+
+### Patch Changes
+
+- e0fc110: chore: patch bump all package
+
+## 0.11.0
+
+### Minor Changes
+
+- 7f8ef74: chore: remove aliasing
+
+### Patch Changes
+
+- b38c7ed: Update build configs to a standardized format
+- 6fbb57e: feat: release all the packages
+
+## 0.10.5
+
+### Patch Changes
+
+- 7ba851f: feature: client ui updates
+
+## 0.10.4
+
+### Patch Changes
+
+- a13f853: feat: update api client ui
+
+## 0.10.3
+
+### Patch Changes
+
+- 45dc04b: fix: can’t release packages
+
+## 0.10.2
+
+### Patch Changes
+
+- 05e2e27: chore: add provenance statement
+
+## 0.10.1
+
+### Patch Changes
+
+- 96ded16: Externalize y-codemirror
+
+## 0.10.0
+
+### Minor Changes
+
+- 0e64a36: refactor: rename all --theme-_ variables to --scalar-_
+
+### Patch Changes
+
+- 22f2858: chore: ran syncpack to update packages
+
+## 0.9.1
+
+### Patch Changes
+
+- 6889ad9: feat: tab and shift+tab codemirror, and escape codeblock hotkeys
+
+## 0.9.0
+
+### Minor Changes
+
+- 7fb8273: Migrate to @scalar/openapi-parser
+
+## 0.8.10
+
+### Patch Changes
+
+- cecf074: Migrate to oas utils for basic spec operations
+
+## 0.8.9
+
+### Patch Changes
+
+- ef3a015: chore: update to typescript 5.4
+
+## 0.8.8
+
+### Patch Changes
+
+- 5bc2ebf: Add syntax highlighting back to codemirror
+
+## 0.8.7
+
+### Patch Changes
+
+- 5a94530: fix: select all keybinding does not work
+
+## 0.8.6
+
+### Patch Changes
+
+- 1669b27: chore: update dependencies
+- 7ea052b: chore: remove some languages from CodeMirror
+
+## 0.8.5
+
+### Patch Changes
+
+- c6b95ca: chore: upgrade from Vite 4 to Vite 5
+
+## 0.8.4
+
+### Patch Changes
+
+- 92a8b9f: chore: update dependencies
+- abfb086: chore: remove unused CodeMirror CSS
+
+## 0.8.3
+
+### Patch Changes
+
+- d4fff0de: Externalize yjs depedency in use-codemirror
+
+## 0.8.2
+
+### Patch Changes
+
+- f8650e4f: Bundle codemirror and update packages
+
+## 0.8.1
+
+### Patch Changes
+
+- b1f3cb49: feat: Add optional extensions and reactive provider to useCodemirror
+
+## 0.8.0
+
+### Minor Changes
+
+- 612431b4: Migrate model logic from codemirror component to hook
+
+## 0.7.22
+
+### Patch Changes
+
+- 6da73708: feat: handle application/zip responses in the API client
+
+## 0.7.21
+
+### Patch Changes
+
+- cd7afa70: fix: don't scale codemirror text on mobile webkit
+
+## 0.7.20
+
+### Patch Changes
+
+- 3d712d74: chore: remove light/dark mode features from useCodeMirror
+
 ## 0.7.19
 
 ### Patch Changes

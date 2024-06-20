@@ -1,15 +1,12 @@
 <script setup lang="ts">
-import TimeAgo from 'javascript-time-ago'
-import en from 'javascript-time-ago/locale/en'
 import prettyBytes from 'pretty-bytes'
 import prettyMilliseconds from 'pretty-ms'
 
-import { useRequestStore } from '../../stores/requestStore'
-import { type ClientResponse } from '../../types'
+import { humanDiff } from '../../helpers'
+import { useRequestStore } from '../../stores'
+import type { ClientResponse } from '../../types'
 
 defineProps<{ history: string }>()
-TimeAgo.addLocale(en)
-const timeAgo = new TimeAgo('en-US')
 
 const { requestHistory, activeRequestId, setActiveResponse } = useRequestStore()
 
@@ -51,8 +48,17 @@ const getContentLength = (response: ClientResponse) => {
     </div>
     <div class="navtable-item-20 navtable-item-time">
       <span>
-        {{ timeAgo.format(requestHistory[history].sentTime) }}
+        {{ humanDiff(requestHistory[history].sentTime) }}
       </span>
     </div>
   </div>
 </template>
+<style scoped>
+.navtable-item-time {
+  text-transform: capitalize;
+}
+.navtable-item__active {
+  background: var(--scalar-background-2);
+  cursor: default;
+}
+</style>

@@ -1,50 +1,48 @@
 <script setup lang="ts">
 import { useMediaQuery } from '@vueuse/core'
-import { computed, ref, watch } from 'vue'
+import { watch } from 'vue'
 
-import { useNavState } from '../../hooks'
-import { type ReferenceProps, type ReferenceSlots } from '../../types'
-import ApiReferenceBase from '../ApiReferenceBase.vue'
-import DarkModeToggle from '../DarkModeToggle.vue'
+import { useNavState, useSidebar } from '../../hooks'
+import type { ReferenceLayoutProps, ReferenceSlots } from '../../types'
+import ApiReferenceLayout from '../ApiReferenceLayout.vue'
+import { DarkModeToggle } from '../DarkModeToggle'
 import MobileHeader from '../MobileHeader.vue'
 import SearchButton from '../SearchButton.vue'
 
-const props = defineProps<ReferenceProps>()
+const props = defineProps<ReferenceLayoutProps>()
+defineEmits<{
+  (e: 'toggleDarkMode'): void
+}>()
+
 defineSlots<ReferenceSlots>()
 
-const showMobileDrawer = ref(false)
-
 const isMobile = useMediaQuery('(max-width: 1000px)')
+const { isSidebarOpen } = useSidebar()
 
 watch(isMobile, (n, o) => {
   // Close the drawer when we go from desktop to mobile
-  if (n && !o) showMobileDrawer.value = false
-})
-
-// Override the sidebar value for mobile to open and close the drawer
-const config = computed(() => {
-  const showSidebar = isMobile.value
-    ? showMobileDrawer.value
-    : props.configuration?.showSidebar
-  return { ...props.configuration, showSidebar }
+  if (n && !o) isSidebarOpen.value = false
 })
 
 const { hash } = useNavState()
-
-watch(hash, (n, o) => {
-  if (n && n !== o) {
-    showMobileDrawer.value = false
+watch(hash, (newHash, oldHash) => {
+  if (newHash && newHash !== oldHash) {
+    isSidebarOpen.value = false
   }
 })
 </script>
 <template>
-  <ApiReferenceBase
-    :class="{ 'scalar-api-references-standalone-mobile': isMobile }"
-    :configuration="config">
-    <template
-      v-if="isMobile"
-      #header>
-      <MobileHeader v-model:open="showMobileDrawer" />
+  <ApiReferenceLayout
+    :class="{
+      'scalar-api-references-standalone-mobile': configuration.showSidebar,
+    }"
+    :configuration="configuration"
+    :parsedSpec="parsedSpec"
+    :rawSpec="rawSpec">
+    <template #header>
+      <MobileHeader
+        v-if="props.configuration.showSidebar"
+        v-model:open="isSidebarOpen" />
     </template>
     <template #sidebar-start="{ spec }">
       <div class="scalar-api-references-standalone-search">
@@ -54,16 +52,19 @@ watch(hash, (n, o) => {
       </div>
     </template>
     <template #sidebar-end>
-      <DarkModeToggle />
+      <DarkModeToggle
+        :isDarkMode="isDark"
+        @toggleDarkMode="$emit('toggleDarkMode')" />
     </template>
     <!-- Expose the content end slot as a slot for the footer -->
     <template #content-end><slot name="footer" /></template>
-  </ApiReferenceBase>
+  </ApiReferenceLayout>
 </template>
 <style>
-.scalar-api-references-standalone-mobile {
-  /* By default add a header on mobile for the navigation */
-  --theme-header-height: 50px;
+@media (max-width: 1000px) {
+  .scalar-api-references-standalone-mobile {
+    --scalar-header-height: 50px;
+  }
 }
 </style>
 <style scoped>

@@ -1,33 +1,72 @@
 <script setup lang="ts">
-import { type SwaggerEditor } from '@scalar/swagger-editor'
-import { type ThemeId } from '@scalar/themes'
+import { provideUseId } from '@headlessui/vue'
+import '@scalar/components/style.css'
+import type { SSRState } from '@scalar/oas-utils'
+import { defaultStateFactory } from '@scalar/oas-utils/helpers'
+import { type ThemeId, getThemeStyles } from '@scalar/themes'
+import { ScalarToasts } from '@scalar/use-toasts'
 import { useDebounceFn, useMediaQuery, useResizeObserver } from '@vueuse/core'
-import { computed, ref, watch } from 'vue'
+import {
+  computed,
+  defineAsyncComponent,
+  getCurrentInstance,
+  onBeforeMount,
+  onMounted,
+  onServerPrefetch,
+  provide,
+  ref,
+  useSSRContext,
+  watch,
+} from 'vue'
 
-import { useNavState, useSidebar } from '../hooks'
+import { NEW_API_MODAL } from '../features'
+import {
+  GLOBAL_SECURITY_SYMBOL,
+  HIDE_DOWNLOAD_BUTTON_SYMBOL,
+  downloadSpecBus,
+  downloadSpecFile,
+  scrollToId,
+  sleep,
+} from '../helpers'
+import { useDeprecationWarnings, useNavState, useSidebar } from '../hooks'
 import type {
-  ReferenceConfiguration,
+  ReferenceLayoutProps,
   ReferenceLayoutSlot,
   ReferenceSlotProps,
-  Spec,
 } from '../types'
-import { default as ApiClientModal } from './ApiClientModal.vue'
+// import ApiClientModal from './ApiClientModal.vue'
 import { Content } from './Content'
 import GettingStarted from './GettingStarted.vue'
-import Sidebar from './Sidebar.vue'
+import { Sidebar } from './Sidebar'
+import { Style } from './Util'
 
-const props = defineProps<{
-  configuration: ReferenceConfiguration
-  parsedSpec: Spec
-  rawSpec: string
-  swaggerEditorRef?: null | typeof SwaggerEditor
-}>()
+const props = defineProps<Omit<ReferenceLayoutProps, 'isDark'>>()
 
 defineEmits<{
-  (e: 'changeTheme', value: ThemeId): void
+  (e: 'changeTheme', { id, label }: { id: ThemeId; label: string }): void
   (e: 'updateContent', value: string): void
+  (e: 'loadSwaggerFile'): void
+  (e: 'linkSwaggerFile'): void
   (e: 'toggleDarkMode'): void
 }>()
+
+/**
+ * Lazy load the old API CLient, so we don’t have to bundle it if it’s not used.
+ */
+const ApiClientModalOld = defineAsyncComponent(() => {
+  return NEW_API_MODAL
+    ? // Empty component
+      new Promise((resolve) => {
+        // @ts-expect-error Needs a type
+        resolve({ render: () => null })
+      })
+    : // Load component
+      import('./ApiClientModalOld.vue')
+})
+
+defineOptions({
+  inheritAttrs: false,
+})
 
 defineSlots<{
   [x in ReferenceLayoutSlot]: (props: ReferenceSlotProps) => any
@@ -36,63 +75,98 @@ defineSlots<{
 const isLargeScreen = useMediaQuery('(min-width: 1150px)')
 
 // Track the container height to control the sidebar height
-const elementHeight = ref(0)
+const elementHeight = ref('100dvh')
 const documentEl = ref<HTMLElement | null>(null)
 useResizeObserver(documentEl, (entries) => {
-  elementHeight.value = entries[0].contentRect.height
+  elementHeight.value = entries[0].contentRect.height + 'px'
 })
 
-// Scroll to hash if exists
-const initiallyScrolled = ref(false)
-const { breadcrumb, setCollapsedSidebarItem } = useSidebar()
-const { hash, getSectionId } = useNavState()
+const {
+  breadcrumb,
+  collapsedSidebarItems,
+  isSidebarOpen,
+  setCollapsedSidebarItem,
+  hideModels,
+  setParsedSpec,
+} = useSidebar()
 
-// Wait until we have a parsed spec then scroll to hash
-watch(props.parsedSpec, async (val) => {
-  if (initiallyScrolled.value || !val?.info?.title) return
-  initiallyScrolled.value = true
-  const sectionId = getSectionId()
-  const hashStr = hash.value
+const {
+  getPathRoutingId,
+  getSectionId,
+  getTagId,
+  hash,
+  isIntersectionEnabled,
+  pathRouting,
+  updateHash,
+} = useNavState()
 
-  // The original scroll to top from mounted
-  if (!hash.value) {
-    document.querySelector('#tippy')?.scrollTo({
-      top: 0,
-      left: 0,
-    })
-  }
+pathRouting.value = props.configuration.pathRouting
 
-  // Ensure we open the section
-  if (sectionId) setCollapsedSidebarItem(sectionId, true)
+// Ideally this triggers absolutely first on the client so we can set hash value
+onBeforeMount(() => updateHash())
 
-  // I tried to get this to work with nextTick but it would scroll half way above
-  // the section, I'm assuming this is due to the time for the section to render
-  // We can probably come up with something better but this works for now
-  setTimeout(() => {
-    document.getElementById(hashStr)?.scrollIntoView()
-  }, 0)
+// Disables intersection observer and scrolls to section
+const scrollToSection = async (id?: string) => {
+  isIntersectionEnabled.value = false
+  updateHash()
+
+  if (id) scrollToId(id)
+  else documentEl.value?.scrollTo(0, 0)
+
+  await sleep(100)
+  isIntersectionEnabled.value = true
+}
+
+/**
+ * Ensure we add our scalar wrapper class to the headless ui root
+ * mounted is too late
+ */
+onBeforeMount(() => {
+  const observer = new MutationObserver((records: MutationRecord[]) => {
+    const headlessRoot = records.find((record) =>
+      Array.from(record.addedNodes).find(
+        (node) => (node as HTMLDivElement).id === 'headlessui-portal-root',
+      ),
+    )
+    if (headlessRoot) {
+      ;(headlessRoot.addedNodes[0] as HTMLDivElement).classList.add(
+        'scalar-app',
+      )
+      observer.disconnect()
+    }
+  })
+  observer.observe(document.body, { childList: true })
+})
+
+onMounted(() => {
+  // Enable the spec download event bus
+  downloadSpecBus.on(({ specTitle }) => {
+    downloadSpecFile(props.rawSpec, specTitle)
+  })
+
+  // This is what updates the hash ref from hash changes
+  window.onhashchange = () =>
+    scrollToSection(decodeURIComponent(window.location.hash.replace(/^#/, '')))
+
+  // Handle back for path routing
+  window.onpopstate = () =>
+    pathRouting.value &&
+    scrollToSection(getPathRoutingId(window.location.pathname))
 })
 
 const showRenderedContent = computed(
   () => isLargeScreen.value || !props.configuration.isEditable,
 )
 
-const showSwaggerEditor = computed(() => {
-  return (
-    !props.configuration.spec?.preparsedContent &&
-    props.configuration?.isEditable
-  )
-})
-
 // To clear hash when scrolled to the top
 const debouncedScroll = useDebounceFn((value) => {
   const scrollDistance = value.target.scrollTop ?? 0
   if (scrollDistance < 50) {
-    window.history.replaceState(
-      {},
-      '',
-      window.location.pathname + window.location.search,
-    )
+    const basePath = props.configuration.pathRouting
+      ? props.configuration.pathRouting.basePath
+      : window.location.pathname
+
+    window.history.replaceState({}, '', basePath + window.location.search)
     hash.value = ''
   }
 })
@@ -102,19 +176,96 @@ const referenceSlotProps = computed<ReferenceSlotProps>(() => ({
   breadcrumb: breadcrumb.value,
   spec: props.parsedSpec,
 }))
+
+// Keep the parsed spec up to date
+watch(() => props.parsedSpec, setParsedSpec, { deep: true })
+
+// Initialize the server state
+onServerPrefetch(() => {
+  const ctx = useSSRContext<SSRState>()
+  if (!ctx) return
+
+  ctx.payload.data ||= defaultStateFactory()
+
+  // Set initial hash value
+  if (props.configuration.pathRouting) {
+    const id = getPathRoutingId(ctx.url)
+    hash.value = id
+    ctx.payload.data.hash = id
+
+    // For sidebar items we need to reset the state as it persists between requests
+    // This is a temp hack, need to come up with a better solution
+    for (const key in collapsedSidebarItems) {
+      if (Object.hasOwn(collapsedSidebarItems, key))
+        delete collapsedSidebarItems[key]
+    }
+
+    if (id) {
+      setCollapsedSidebarItem(getSectionId(id), true)
+    } else {
+      const firstTag = props.parsedSpec.tags?.[0]
+      if (firstTag) setCollapsedSidebarItem(getTagId(firstTag), true)
+    }
+    ctx.payload.data['useSidebarContent-collapsedSidebarItems'] =
+      collapsedSidebarItems
+  }
+})
+
+/**
+ * Due to a bug in headless UI, we need to set an ID here that can be shared across server/client
+ * TODO remove this once the bug is fixed
+ *
+ * @see https://github.com/tailwindlabs/headlessui/issues/2979
+ */
+provideUseId(() => {
+  const instance = getCurrentInstance()
+  const ATTR_KEY = 'scalar-instance-id'
+
+  if (!instance) return ATTR_KEY
+  let instanceId = instance.uid
+
+  // SSR: grab the instance ID from vue and set it as an attribute
+  if (typeof window === 'undefined') {
+    instance.attrs ||= {}
+    instance.attrs[ATTR_KEY] = instanceId
+  }
+  // Client: grab the instanceId from the attribute and return it to headless UI
+  else if (instance.vnode.el?.getAttribute) {
+    instanceId = instance.vnode.el.getAttribute(ATTR_KEY)
+  }
+  return `${ATTR_KEY}-${instanceId}`
+})
+
+// Provide global security
+provide(GLOBAL_SECURITY_SYMBOL, () => props.parsedSpec.security)
+provide(
+  HIDE_DOWNLOAD_BUTTON_SYMBOL,
+  () => props.configuration.hideDownloadButton,
+)
+
+hideModels.value = props.configuration.hideModels ?? false
+
+useDeprecationWarnings(props.configuration)
 </script>
 <template>
+  <Style>{{
+    getThemeStyles(configuration.theme, {
+      fonts: configuration.withDefaultFonts,
+    })
+  }}</Style>
   <div
     ref="documentEl"
-    class="scalar-api-reference references-layout"
+    class="scalar-app scalar-api-reference references-layout"
     :class="[
       {
-        'references-editable': showSwaggerEditor,
+        'references-editable': configuration.isEditable,
         'references-sidebar': configuration.showSidebar,
+        'references-sidebar-mobile-open': isSidebarOpen,
         'references-classic': configuration.layout === 'classic',
       },
+      $attrs.class,
     ]"
-    :style="{ '--full-height': `${elementHeight}px` }"
+    :style="{ '--full-height': elementHeight }"
     @scroll.passive="debouncedScroll">
     <!-- Header -->
     <div class="references-header">
@@ -124,7 +275,7 @@ const referenceSlotProps = computed<ReferenceSlotProps>(() => ({
     </div>
     <!-- Navigation (sidebar) wrapper -->
     <aside
-      v-show="configuration.showSidebar"
+      v-if="configuration.showSidebar"
       class="references-navigation t-doc__sidebar">
       <!-- Navigation tree / Table of Contents -->
       <div class="references-navigation-list">
@@ -144,7 +295,7 @@ const referenceSlotProps = computed<ReferenceSlotProps>(() => ({
     </aside>
     <!-- Swagger file editing -->
     <div
-      v-show="showSwaggerEditor"
+      v-show="configuration.isEditable"
       class="references-editor">
       <div class="references-editor-textarea">
         <slot
@@ -156,9 +307,10 @@ const referenceSlotProps = computed<ReferenceSlotProps>(() => ({
     <template v-if="showRenderedContent">
       <div class="references-rendered">
         <Content
+          :baseServerURL="configuration.baseServerURL"
           :layout="configuration.layout === 'classic' ? 'accordion' : 'default'"
           :parsedSpec="parsedSpec"
-          :rawSpec="rawSpec">
+          :proxy="configuration.proxy">
           <template #start>
             <slot
               v-bind="referenceSlotProps"
@@ -169,9 +321,9 @@ const referenceSlotProps = computed<ReferenceSlotProps>(() => ({
             #empty-state>
             <GettingStarted
               :theme="configuration?.theme || 'default'"
-              :value="rawSpec"
               @changeTheme="$emit('changeTheme', $event)"
-              @openSwaggerEditor="swaggerEditorRef?.handleOpenSwaggerEditor"
+              @linkSwaggerFile="$emit('linkSwaggerFile')"
+              @loadSwaggerFile="$emit('loadSwaggerFile')"
               @updateContent="$emit('updateContent', $event)" />
           </template>
           <template #end>
@@ -190,7 +342,14 @@ const referenceSlotProps = computed<ReferenceSlotProps>(() => ({
       </div>
     </template>
     <!-- REST API Client Overlay -->
-    <ApiClientModal
+    <!-- Fonts are fetched by @scalar/api-reference already, we can safely set `withDefaultFonts: false` -->
+    <!-- <ApiClientModal -->
+    <!--   v-if="NEW_API_MODAL" -->
+    <!--   :proxyUrl="configuration.proxy" -->
+    <!--   :spec="configuration.spec" /> -->
+    <!-- API Client Overlay -->
+    <!-- Fonts are fetched by @scalar/api-reference already, we can safely set `withDefaultFonts: false` -->
+    <ApiClientModalOld
       :parsedSpec="parsedSpec"
       :proxyUrl="configuration?.proxy">
       <template #sidebar-start>
@@ -203,20 +362,31 @@ const referenceSlotProps = computed<ReferenceSlotProps>(() => ({
           v-bind="referenceSlotProps"
           name="sidebar-end" />
       </template>
-    </ApiClientModal>
+    </ApiClientModalOld>
   </div>
+  <ScalarToasts />
 </template>
+<style>
+/** Used to check if css is loaded */
+:root {
+  --scalar-loaded-api-reference: true;
+}
+</style>
 <style scoped>
 /* Configurable Layout Variables */
-.scalar-api-reference {
-  --refs-sidebar-width: var(--theme-sidebar-width, 0px);
-  --refs-header-height: var(--theme-header-height, 0px);
-  --refs-content-max-width: var(--theme-content-max-width, 1120px);
-}
+@layer scalar-config {
+  .scalar-api-reference {
+    --refs-sidebar-width: var(--scalar-sidebar-width, 0px);
+    --refs-header-height: var(--scalar-header-height, 0px);
+    --refs-content-max-width: var(--scalar-content-max-width, 1540px);
+  }
 
-.scalar-api-reference.references-classic {
-  /* Classic layout is wider */
-  --refs-content-max-width: var(--theme-content-max-width, 1420px);
+  .scalar-api-reference.references-classic {
+    /* Classic layout is wider */
+    --refs-content-max-width: var(--scalar-content-max-width, 1420px);
+    min-height: 100dvh;
+    --refs-sidebar-width: 0;
+  }
 }
 
 /* ----------------------------------------------------- */
@@ -232,6 +402,7 @@ const referenceSlotProps = computed<ReferenceSlotProps>(() => ({
   /* Scroll vertically */
   overflow-y: auto;
   overflow-x: hidden;
+  scrollbar-gutter: stable;
 
   /*
   Calculated by a resize observer and set in the style attribute
@@ -248,7 +419,7 @@ const referenceSlotProps = computed<ReferenceSlotProps>(() => ({
     'navigation rendered'
     'footer footer';
 
-  background: var(--theme-background-1, var(--default-theme-background-1));
+  background: var(--scalar-background-1);
 }
 
 .references-header {
@@ -264,7 +435,7 @@ const referenceSlotProps = computed<ReferenceSlotProps>(() => ({
   grid-area: editor;
   display: flex;
   min-width: 0;
-  background: var(--theme-background-1, var(--default-theme-background-1));
+  background: var(--scalar-background-1);
   z-index: 1;
 }
 
@@ -276,7 +447,7 @@ const referenceSlotProps = computed<ReferenceSlotProps>(() => ({
   position: relative;
   grid-area: rendered;
   min-width: 0;
-  background: var(--theme-background-1, var(--default-theme-background-1));
+  background: var(--scalar-background-1);
 }
 .scalar-api-reference.references-classic,
 .references-classic .references-rendered {
@@ -288,13 +459,7 @@ const referenceSlotProps = computed<ReferenceSlotProps>(() => ({
   position: sticky;
   top: var(--refs-header-height);
   height: calc(var(--full-height) - var(--refs-header-height));
-  background: var(
-    --sidebar-background-1,
-    var(
-      --default-sidebar-background-1,
-      var(--theme-background-1, var(--default-theme-background-1))
-    )
-  );
+  background: var(--scalar-sidebar-background-1 var(--scalar-background-1));
   overflow-y: auto;
   display: flex;
   flex-direction: column;
@@ -318,10 +483,11 @@ const referenceSlotProps = computed<ReferenceSlotProps>(() => ({
     'navigation editor rendered'
     'footer footer footer';
 }
-
-.references-sidebar {
-  /* Set a default width if references are enabled */
-  --refs-sidebar-width: var(--theme-sidebar-width, 250px);
+@layer scalar-config {
+  .references-sidebar {
+    /* Set a default width if references are enabled */
+    --refs-sidebar-width: var(--scalar-sidebar-width, 280px);
+  }
 }
 
 /* Footer */
@@ -350,7 +516,7 @@ const referenceSlotProps = computed<ReferenceSlotProps>(() => ({
       'rendered'
       'footer';
   }
-  .references-sidebar {
+  .references-sidebar.references-sidebar-mobile-open {
     overflow-y: hidden;
   }
   .references-editable {
@@ -370,10 +536,15 @@ const referenceSlotProps = computed<ReferenceSlotProps>(() => ({
   }
 
   .references-navigation {
+    display: none;
     position: sticky;
     top: var(--refs-header-height);
     height: 0px;
     z-index: 10;
+  }
+
+  .references-sidebar-mobile-open .references-navigation {
+    display: block;
   }
 
   .references-navigation-list {
@@ -386,8 +557,7 @@ const referenceSlotProps = computed<ReferenceSlotProps>(() => ({
     height: calc(var(--full-height) - var(--refs-header-height) + 1px);
     width: 100%;
 
-    border-top: 1px solid
-      var(--theme-border-color, var(--default-theme-border-color));
+    border-top: 1px solid var(--scalar-border-color);
     display: flex;
     flex-direction: column;
   }

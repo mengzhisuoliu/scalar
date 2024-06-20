@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import { computed, useAttrs } from 'vue'
 
-import { cx } from '@/cva'
-
+import { cx } from '../../cva'
 import { type LoadingState, ScalarLoading } from '../ScalarLoading'
 import { type Variants, variants } from './variants'
 
@@ -16,11 +15,13 @@ withDefaults(
     loading?: LoadingState
     size?: Variants['size']
     variant?: Variants['variant']
+    type?: 'button' | 'submit' | 'reset'
   }>(),
   {
     fullWidth: false,
     size: 'md',
     variant: 'solid',
+    type: 'button',
   },
 )
 
@@ -29,7 +30,7 @@ defineOptions({ inheritAttrs: false })
 /* Extract the classes so they can be merged by `cx` */
 const attrs = computed(() => {
   const { class: className, ...rest } = useAttrs()
-  return { className: className || '', rest }
+  return { class: className || '', rest }
 })
 </script>
 <template>
@@ -40,10 +41,10 @@ const attrs = computed(() => {
       cx(
         variants({ fullWidth, disabled, size, variant }),
         { 'pl-9 pr-3': loading },
-        `${attrs.className}`,
+        `${attrs.class}`,
       )
     "
-    type="button">
+    :type="type">
     <div
       v-if="$slots.icon"
       class="mr-2 h-4 w-4">

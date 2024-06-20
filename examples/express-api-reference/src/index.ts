@@ -33,21 +33,24 @@ const OpenApiSpecification = swaggerJsdoc({
   apis: ['./src/*.ts'],
 })
 
-// TODO: Remove later
-app.get('/swagger.json', (req, res) => {
+// Serve the OpenAPI specification
+app.get('/openapi.json', (req, res) => {
   res.json(OpenApiSpecification)
 })
 
+// Serve the API Reference
 app.use(
   '/',
   apiReference({
     spec: {
-      content: OpenApiSpecification,
+      url: '/openapi.json',
     },
   }),
 )
 
 // Listen
-app.listen(5056, () => {
-  console.log('💻 Express listening on http://localhost:5056')
+const PORT = Number(process.env.PORT) || 5055
+const HOST = process.env.HOST || '0.0.0.0'
+app.listen(PORT, HOST, () => {
+  console.log(`💻 Express listening on http://${HOST}:${PORT}`)
 })

@@ -28,15 +28,25 @@ withDefaults(
 .simple-cell {
   all: unset;
   display: table-cell;
-  border-right: 1px solid
-    var(--theme-border-color, var(--default-theme-border-color));
+  border-right: 0.5px solid var(--scalar-border-color);
   position: relative;
   padding: 9px !important;
-  color: var(--theme-color-1, var(--default-theme-color-1));
+  color: var(--scalar-color-1);
   white-space: nowrap;
 }
+.simple-cell:first-of-type {
+  position: sticky;
+  left: 0;
+  background-color: var(--scalar-background-1);
+  z-index: 1;
+  box-shadow: 0 -0.5px var(--scalar-border-color);
+  color: var(--scalar-color-3);
+}
+.simple-row:first-of-type .simple-cell:first-of-type {
+  border-top-left-radius: var(--scalar-radius);
+}
 .simple-cell a {
-  color: var(--theme-color-1, var(--default-theme-color-1)) !important;
+  color: var(--scalar-color-1) !important;
 }
 .simple-cell:last-of-type {
   border-right: none;
@@ -47,6 +57,6 @@ withDefaults(
 }
 
 .simple-cell.strong {
-  font-weight: var(--theme-semibold, var(--default-theme-semibold));
+  font-weight: var(--scalar-semibold);
 }
 </style>

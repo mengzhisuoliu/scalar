@@ -1,5 +1,82 @@
 # @scalar/use-toasts
 
+## 0.7.2
+
+### Patch Changes
+
+- a2cb3c3: Migrate away from unintended peer dependencies
+
+## 0.7.1
+
+### Patch Changes
+
+- e0fc110: chore: patch bump all package
+
+## 0.7.0
+
+### Minor Changes
+
+- 7f8ef74: chore: remove aliasing
+
+### Patch Changes
+
+- b38c7ed: Update build configs to a standardized format
+- 6fbb57e: feat: release all the packages
+
+## 0.6.7
+
+### Patch Changes
+
+- cc5402c: feat: support for descriptions
+
+## 0.6.6
+
+### Patch Changes
+
+- 670156e: chore: bump packages
+
+## 0.6.5
+
+### Patch Changes
+
+- 2e7b074: feat: clean up toast styles and colors
+
+## 0.6.4
+
+### Patch Changes
+
+- 45dc04b: fix: can’t release packages
+
+## 0.6.3
+
+### Patch Changes
+
+- 05e2e27: chore: add provenance statement
+
+## 0.6.2
+
+### Patch Changes
+
+- b234d1d: feat: added two events to standalone references build with tests
+
+## 0.6.1
+
+### Patch Changes
+
+- a8c3045: build: re-introduce @scalar/use-toasts package
+
+## 0.5.15
+
+### Patch Changes
+
+- c6b95ca: chore: upgrade from Vite 4 to Vite 5
+
+## 0.5.14
+
+### Patch Changes
+
+- 92a8b9f: chore: update dependencies
+
 ## 0.5.13
 
 ### Patch Changes

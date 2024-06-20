@@ -24,8 +24,11 @@ module.exports = {
     '**/dist-publish/**',
     '**/.vite-ssg-temp/**',
     '**/vite.config.ts',
+    '**/vitest.config.ts',
+    '**/tailwind.config.ts',
     '**/vite.standalone.config.ts',
     '**/cdn/**',
+    '**/hydrateClient.d.ts',
   ],
   rules: {
     // ---------------------------------------------------------------------------
@@ -66,6 +69,7 @@ module.exports = {
     {
       files: ['**.vue', '**.ts'],
       rules: {
+        '@typescript-eslint/no-import-type-side-effects': 'warn',
         'no-array-constructor': 'off',
         '@typescript-eslint/no-array-constructor': 'error',
         'no-shadow': 'off',
@@ -93,6 +97,7 @@ module.exports = {
         ],
         '@typescript-eslint/prefer-optional-chain': 'warn',
         'camelcase': 'off',
+        'max-len': ['warn', { code: 120, comments: 120 }],
         '@typescript-eslint/naming-convention': [
           'error',
           // {

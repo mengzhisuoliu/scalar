@@ -5,12 +5,17 @@
   "author": "Scalar (https://github.com/scalar)",
   "homepage": "https://github.com/scalar/scalar",
   "bugs": "https://github.com/scalar/scalar/issues/new/choose",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/scalar/scalar.git",
+    "directory": "packages/themes"
+  },
   "keywords": [
     "css",
     "css-variables",
     "scalar"
   ],
-  "version": "0.5.4",
+  "version": "0.9.5",
   "engines": {
     "node": ">=18"
   },
@@ -25,35 +30,29 @@
   "main": "./dist/index.js",
   "exports": {
     ".": "./dist/index.js",
-    "./base.css": "./dist/base.css",
-    "./scrollbar.css": "./dist/scrollbar.css",
-    "./presets/alternate.css": "./dist/presets/alternate.css",
-    "./presets/default.css": "./dist/presets/default.css",
-    "./presets/moon.css": "./dist/presets/moon.css",
-    "./presets/purple.css": "./dist/presets/purple.css",
-    "./presets/solarized.css": "./dist/presets/solarized.css"
+    "./tailwind": "./src/tailwind.ts",
+    "./style.css": "./dist/style.css",
+    "./presets/*.css": "./dist/presets/*.css"
   },
   "files": [
     "dist",
-    "CHANGELOG.md"
+    "CHANGELOG.md",
+    "src/tailwind.ts"
   ],
   "module": "./dist/index.js",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/scalar/scalar.git",
-    "directory": "packages/default-theme"
+  "dependencies": {
+    "vue": "^3.4.22"
   },
   "devDependencies": {
-    "@vitejs/plugin-vue": "^4.4.0",
-    "@vitest/coverage-v8": "^0.34.4",
+    "@rise8/tailwind-pixel-perfect-preset": "^1.0.1",
+    "@scalar/build-tooling": "workspace:*",
+    "@vitejs/plugin-vue": "^5.0.4",
+    "@vitest/coverage-v8": "^1.6.0",
+    "tailwindcss": "^3.4.4",
     "tsc-alias": "^1.8.8",
-    "vite": "^4.5.2",
-    "vite-plugin-css-injected-by-js": "^3.3.0",
-    "vite-plugin-static-copy": "^0.17.0",
-    "vitest": "^0.34.4",
-    "vue-tsc": "^1.8.19"
-  },
-  "peerDependencies": {
-    "vue": "^3.3.0"
+    "vite": "^5.2.10",
+    "vite-plugin-static-copy": "^1.0.2",
+    "vitest": "^1.6.0",
+    "vue-tsc": "^2.0.13"
   }
 }

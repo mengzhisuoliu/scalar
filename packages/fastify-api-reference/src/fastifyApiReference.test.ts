@@ -1,5 +1,5 @@
 import Fastify from 'fastify'
-import { describe, expect, it, vi } from 'vitest'
+import { describe, expect, it } from 'vitest'
 
 import fastifyApiReference from './index'
 
@@ -12,13 +12,28 @@ describe('fastifyApiReference', () => {
     fastify.register(fastifyApiReference, {
       routePrefix: '/reference',
       configuration: {
-        spec: { url: '/swagger.json' },
+        spec: { url: '/openapi.json' },
       },
     })
 
     const address = await fastify.listen({ port: 0 })
     const response = await fetch(`${address}/reference`)
     expect(response.status).toBe(200)
+  })
+
+  it('hasPlugin(fastifyApiReference) returns true', async () => {
+    const fastify = Fastify({
+      logger: false,
+    })
+
+    await fastify.register(fastifyApiReference, {
+      routePrefix: '/reference',
+      configuration: {
+        spec: { url: '/openapi.json' },
+      },
+    })
+
+    expect(fastify.hasPlugin('@scalar/fastify-api-reference')).toBeTruthy()
   })
 
   it('no fastify-html exposed', async () => {
@@ -29,7 +44,7 @@ describe('fastifyApiReference', () => {
     await fastify.register(fastifyApiReference, {
       routePrefix: '/reference',
       configuration: {
-        spec: { url: '/swagger.json' },
+        spec: { url: '/openapi.json' },
       },
     })
 
@@ -44,7 +59,7 @@ describe('fastifyApiReference', () => {
 
     fastify.register(fastifyApiReference, {
       configuration: {
-        spec: { url: '/swagger.json' },
+        spec: { url: '/openapi.json' },
       },
     })
 
@@ -61,7 +76,7 @@ describe('fastifyApiReference', () => {
     fastify.register(fastifyApiReference, {
       routePrefix: '/reference',
       configuration: {
-        spec: { url: '/swagger.json' },
+        spec: { url: '/openapi.json' },
       },
     })
 
@@ -69,6 +84,26 @@ describe('fastifyApiReference', () => {
     const response = await fetch(`${address}/reference`)
     expect(await response.text()).toContain(
       '/reference/@scalar/fastify-api-reference/js/browser.js',
+    )
+  })
+
+  it('prefixes the JS url', async () => {
+    const fastify = Fastify({
+      logger: false,
+    })
+
+    fastify.register(fastifyApiReference, {
+      routePrefix: '/reference',
+      publicPath: '/foobar',
+      configuration: {
+        spec: { url: '/openapi.json' },
+      },
+    })
+
+    const address = await fastify.listen({ port: 0 })
+    const response = await fetch(`${address}/reference`)
+    expect(await response.text()).toContain(
+      '/foobar/reference/@scalar/fastify-api-reference/js/browser.js',
     )
   })
 
@@ -80,13 +115,13 @@ describe('fastifyApiReference', () => {
     fastify.register(fastifyApiReference, {
       routePrefix: '/reference',
       configuration: {
-        spec: { url: '/swagger.json' },
+        spec: { url: '/openapi.json' },
       },
     })
 
     const address = await fastify.listen({ port: 0 })
     const response = await fetch(`${address}/reference`)
-    expect(await response.text()).toContain('/swagger.json')
+    expect(await response.text()).toContain('/openapi.json')
   })
 
   it('has the spec', async () => {
@@ -152,13 +187,15 @@ describe('fastifyApiReference', () => {
     fastify.register(fastifyApiReference, {
       routePrefix: '/reference',
       configuration: {
-        spec: { url: '/swagger.json' },
+        spec: { url: '/openapi.json' },
       },
     })
 
     const address = await fastify.listen({ port: 0 })
     const response = await fetch(`${address}/reference`)
-    expect(await response.text()).toContain('<title>API Reference</title>')
+    expect(await response.text()).toContain(
+      '<title>Scalar API Reference</title>',
+    )
   })
 
   it('has the correct content type', async () => {
@@ -169,7 +206,7 @@ describe('fastifyApiReference', () => {
     fastify.register(fastifyApiReference, {
       routePrefix: '/reference',
       configuration: {
-        spec: { url: '/swagger.json' },
+        spec: { url: '/openapi.json' },
       },
     })
 

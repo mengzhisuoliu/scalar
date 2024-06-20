@@ -1,28 +1,30 @@
 <script setup lang="ts">
-import { computed, watch } from 'vue'
+import {
+  SecurityScheme,
+  SecuritySchemeSelector,
+  useAuthenticationStore,
+} from '@scalar/api-client'
+import type { SSRState, Spec } from '@scalar/oas-utils'
+import type { OpenAPIV3_1 } from '@scalar/openapi-parser'
+import { computed, onServerPrefetch, useSSRContext, watch } from 'vue'
 
-import { hasSecuritySchemes } from '../../../helpers'
-import { useGlobalStore } from '../../../stores'
-import { type Spec } from '../../../types'
-import { Card, CardContent, CardHeader } from '../../Card'
-import SecurityScheme from './SecurityScheme.vue'
-import SecuritySchemeSelector from './SecuritySchemeSelector.vue'
+import { hasSecuritySchemes, sleep } from '../../../helpers'
 
-const props = defineProps<{ parsedSpec?: Spec }>()
+const props = defineProps<{ parsedSpec?: Spec; proxy?: string }>()
 
-const { authentication, setAuthentication } = useGlobalStore()
+const { authentication, setAuthentication } = useAuthenticationStore()
 
 const showSecurityScheme = computed(() => {
-  if (!authentication.securitySchemeKey) {
+  if (!authentication.preferredSecurityScheme) {
     return false
   }
 
   const scheme =
     props.parsedSpec?.components?.securitySchemes?.[
-      authentication.securitySchemeKey
+      authentication.preferredSecurityScheme
     ]
 
-  return !!scheme?.type
+  return !!scheme && 'type' in scheme && !!scheme.type
 })
 
 // Keep a copy of the security schemes in the global authentication state
@@ -35,43 +37,46 @@ watch(
   },
   { deep: true, immediate: true },
 )
+
+// SSR hack - waits for the computed to complete and store in state
+onServerPrefetch(async () => {
+  const ctx = useSSRContext<SSRState>()
+  await sleep(1)
+  ctx!.payload.data['useGlobalStore-authentication'] = authentication
+})
 </script>
 
 <template>
-  <Card v-if="hasSecuritySchemes(parsedSpec)">
-    <CardHeader
-      borderless
-      class="authentication-header"
-      transparent>
-      Authentication
-      <template #actions>
-        <div class="selector">
-          <SecuritySchemeSelector
-            :value="
-              parsedSpec?.components?.securitySchemes
-            "></SecuritySchemeSelector>
-        </div>
-      </template>
-    </CardHeader>
-    <CardContent
+  <div v-if="hasSecuritySchemes(parsedSpec)">
+    <div class="authentication-header">
+      <!-- <template #actions> -->
+      <div class="selector">
+        <SecuritySchemeSelector
+          :value="
+            parsedSpec?.components?.securitySchemes
+          "></SecuritySchemeSelector>
+      </div>
+      <!-- </template> -->
+    </div>
+    <div
       v-if="showSecurityScheme"
-      class="authentication-content"
-      transparent>
+      class="authentication-content">
       <SecurityScheme
-        v-if="authentication.securitySchemeKey"
+        v-if="authentication.preferredSecurityScheme"
+        :proxy="proxy"
         :value="
           parsedSpec?.components?.securitySchemes?.[
-            authentication.securitySchemeKey
-          ]
+            authentication.preferredSecurityScheme
+          ] as OpenAPIV3_1.SecuritySchemeObject
         " />
-    </CardContent>
-  </Card>
+    </div>
+  </div>
 </template>
 <style scoped>
-.authentication-content {
-  padding: 9px;
+.authentication-header {
+  white-space: nowrap;
 }
 .selector {
-  margin-right: 12px;
+  margin-bottom: 6px;
 }
 </style>

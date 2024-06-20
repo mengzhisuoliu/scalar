@@ -1,14 +1,18 @@
+import type { Heading, Tag, TransformedOperation } from '@scalar/oas-utils'
+import { ssrState } from '@scalar/oas-utils/helpers'
 import { slug } from 'github-slugger'
-import { onMounted, ref } from 'vue'
+import { ref } from 'vue'
 
-import { type Heading, scrollToId, sleep } from '../helpers'
-import type { Tag, TransformedOperation } from '../types'
+import type { PathRouting } from '../types'
 
 // Keeps track of the URL hash without the #
-const hash = ref('')
+const hash = ref(ssrState.hash ?? '')
+
+// Are we using path routing
+const pathRouting = ref<PathRouting | undefined>()
 
 // To disable the intersection observer on click
-const isIntersectionEnabled = ref(true)
+const isIntersectionEnabled = ref(false)
 
 /**
  * ID creation methods
@@ -19,6 +23,13 @@ const getHeadingId = (heading: Heading) => {
   }
 
   return ''
+}
+
+const getPathRoutingId = (pathName: string) => {
+  if (!pathRouting.value) return ''
+
+  const reggy = new RegExp('^' + pathRouting.value?.basePath + '/?')
+  return decodeURIComponent(pathName.replace(reggy, ''))
 }
 
 const getWebhookId = (name?: string, httpVerb?: string) => {
@@ -54,13 +65,18 @@ const getTagId = ({ name }: Tag) => {
 // Grabs the sectionId of the hash to open the section before scrolling
 const getSectionId = (hashStr = hash.value) => {
   const tagId = hashStr.match(/(tag\/[^/]+)/)?.[0]
-  const modelId = hashStr.includes('model/') ? 'models' : ''
+  const modelId = hashStr.startsWith('model') ? 'models' : ''
+  const webhookId = hashStr.startsWith('webhook') ? 'webhooks' : ''
 
-  return tagId ?? modelId
+  return tagId || modelId || webhookId
 }
 
 // Update the reactive hash state
-const updateHash = () => (hash.value = window.location.hash.replace(/^#/, ''))
+const updateHash = () => {
+  hash.value = pathRouting.value
+    ? getPathRoutingId(window.location.pathname)
+    : decodeURIComponent(window.location.hash.replace(/^#/, ''))
+}
 
 /**
  * Hook which provides reactive hash state from the URL
@@ -68,36 +84,17 @@ const updateHash = () => (hash.value = window.location.hash.replace(/^#/, ''))
  *
  * isIntersectionEnabled is a hack to prevent intersection observer from triggering
  * when clicking on sidebar links or going backwards
- *
- *
- * @param hasLifecyle - we cannot use lifecycle hooks when called from another composable, this prevents that
  */
-export const useNavState = (hasLifecyle = true) => {
-  if (hasLifecyle) {
-    onMounted(() => {
-      updateHash()
-      window.onhashchange = async () => {
-        isIntersectionEnabled.value = false
-        updateHash()
-
-        // TODO: we should be able to remove this once we find the cause
-        // for some reason pressing back doesn't always scroll to the correct section
-        scrollToId(window.location.hash.replace(/^#/, ''))
-
-        await sleep(100)
-        isIntersectionEnabled.value = true
-      }
-    })
-  }
-
-  return {
-    hash,
-    getWebhookId,
-    getModelId,
-    getHeadingId,
-    getOperationId,
-    getSectionId,
-    getTagId,
-    isIntersectionEnabled,
-  }
-}
+export const useNavState = () => ({
+  hash,
+  getWebhookId,
+  getModelId,
+  getHeadingId,
+  getOperationId,
+  getPathRoutingId,
+  getSectionId,
+  getTagId,
+  isIntersectionEnabled,
+  pathRouting,
+  updateHash,
+})

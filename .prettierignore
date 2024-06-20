@@ -3,6 +3,11 @@
 **/.hg
 **/node_modules
 **/dist/**
+**/.turbo/**
+**/.docusaurus/**
+**/build/**
+**/.next/**
+**/.nuxt/**
 
 /venv/
 **/venv
@@ -15,3 +20,7 @@ cdn
 
 fixtures
 .vite-ssg-temp
+.next
+
+examples/docusaurus/**/*.mdx
+packages/nuxt/src/runtime/plugins/hydrateClient.d.mts

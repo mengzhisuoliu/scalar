@@ -2,6 +2,9 @@ import { serve } from '@hono/node-server'
 import { OpenAPIHono, createRoute, z } from '@hono/zod-openapi'
 import { apiReference } from '@scalar/hono-api-reference'
 
+const PORT = Number(process.env.PORT) || 5054
+const HOST = process.env.HOST || '0.0.0.0'
+
 const app = new OpenAPIHono()
 
 // Example route
@@ -25,7 +28,8 @@ app.openapi(
     },
   }),
   (c) => {
-    return c.jsonT({
+    // @ts-expect-error invalid type depth
+    return c.json({
       message: 'hello',
     })
   },
@@ -58,7 +62,7 @@ app.openapi(
     },
   }),
   (c) => {
-    return c.jsonT({
+    return c.json({
       posts: [
         {
           id: 123,
@@ -105,7 +109,7 @@ app.openapi(
     },
   }),
   (c) => {
-    return c.jsonT({
+    return c.json({
       id: 123,
       title: 'My Blog Post',
       body: 'I want to share something with you …',
@@ -151,7 +155,7 @@ app.openapi(
     },
   }),
   (c) => {
-    return c.jsonT({
+    return c.json({
       status: 'OK',
       message: 'Post deleted',
     })
@@ -159,7 +163,7 @@ app.openapi(
 )
 
 // Create a Swagger file
-app.doc('/swagger.json', {
+app.doc('/openapi.json', {
   info: {
     title: 'Example',
     description:
@@ -174,7 +178,7 @@ app.get(
   '/',
   apiReference({
     spec: {
-      url: '/swagger.json',
+      url: '/openapi.json',
       // content: {
       //   openapi: '3.1.0',
       //   info: { title: 'Example' },
@@ -189,11 +193,12 @@ app.get(
 serve(
   {
     fetch: app.fetch,
-    port: 5055,
+    port: PORT,
+    hostname: HOST,
   },
   (address) => {
     console.log(
-      `🔥 Hono Middleware listening on http://localhost:${address.port}/`,
+      `🔥 Hono Middleware listening on http://${HOST}:${address.port}/`,
     )
   },
 )

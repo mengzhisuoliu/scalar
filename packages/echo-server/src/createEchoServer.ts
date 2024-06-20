@@ -1,7 +1,7 @@
 import cookieParser from 'cookie-parser'
 import cors from 'cors'
 import Express from 'express'
-import { type Server } from 'http'
+import type { Server } from 'http'
 
 export const createEchoServer = () => {
   const app = Express()
@@ -15,6 +15,10 @@ export const createEchoServer = () => {
   app.use(cookieParser())
   app.use(Express.json())
   app.disable('x-powered-by')
+
+  app.all('/404', async (req, res) => {
+    res.status(404).send('Not Found')
+  })
 
   // Return zip files for all requests ending with .zip
   app.all('/*.zip', async (req, res) => {

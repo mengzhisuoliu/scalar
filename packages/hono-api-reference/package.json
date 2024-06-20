@@ -5,7 +5,12 @@
   "author": "Scalar (https://github.com/scalar)",
   "homepage": "https://github.com/scalar/scalar",
   "bugs": "https://github.com/scalar/scalar/issues/new/choose",
-  "version": "0.3.24",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/scalar/scalar.git",
+    "directory": "packages/hono-api-reference"
+  },
+  "version": "0.5.76",
   "engines": {
     "node": ">=18"
   },
@@ -32,21 +37,14 @@
     "dist"
   ],
   "module": "dist/index.js",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/scalar/scalar.git",
-    "directory": "packages/hono-api-reference"
-  },
   "dependencies": {
-    "@scalar/api-reference": "workspace:*"
+    "@scalar/api-reference": "workspace:*",
+    "hono": "^4.2.7"
   },
   "devDependencies": {
-    "hono": "^3.11.7",
+    "hono": "^4.2.7",
     "tsup": "^7.2.0",
-    "vite": "^4.5.2",
-    "vitest": "^0.34.4"
-  },
-  "peerDependencies": {
-    "hono": "^3.0.0"
+    "vite": "^5.2.10",
+    "vitest": "^1.6.0"
   }
 }

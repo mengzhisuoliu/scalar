@@ -1,5 +1,111 @@
 # @scalar/api-client-proxy
 
+## 0.7.1
+
+### Patch Changes
+
+- e0fc110: chore: patch bump all package
+
+## 0.7.0
+
+### Minor Changes
+
+- 7f8ef74: chore: remove aliasing
+
+### Patch Changes
+
+- 6fbb57e: feat: release all the packages
+
+## 0.6.0
+
+### Minor Changes
+
+- 7d3bc16: feat: css files must be explicitly imported, check the docs
+
+## 0.5.27
+
+### Patch Changes
+
+- 45dc04b: fix: can’t release packages
+
+## 0.5.26
+
+### Patch Changes
+
+- 05e2e27: chore: add provenance statement
+
+## 0.5.25
+
+### Patch Changes
+
+- 07211ad: chore: added new lint rule for type importing for better perf
+
+## 0.5.24
+
+### Patch Changes
+
+- 22f2858: chore: ran syncpack to update packages
+
+## 0.5.23
+
+### Patch Changes
+
+- ef3a015: chore: update to typescript 5.4
+
+## 0.5.22
+
+### Patch Changes
+
+- 3b672cc: fix: revert css changes to components lib
+
+## 0.5.21
+
+### Patch Changes
+
+- 5bc2ebf: Add syntax highlighting back to codemirror
+
+## 0.5.20
+
+### Patch Changes
+
+- 1669b27: chore: update dependencies
+
+## 0.5.19
+
+### Patch Changes
+
+- c6b95ca: chore: upgrade from Vite 4 to Vite 5
+
+## 0.5.18
+
+### Patch Changes
+
+- 92a8b9f: chore: update dependencies
+
+## 0.5.17
+
+### Patch Changes
+
+- cb8139e7: fix: rollback api client proxy and request changes
+
+## 0.5.16
+
+### Patch Changes
+
+- 037029cc: fix: only expose special proxy headers instead of \*
+
+## 0.5.15
+
+### Patch Changes
+
+- dd6dd283: fix: expect a blob when fetching spec via proxy
+
+## 0.5.14
+
+### Patch Changes
+
+- 6da73708: feat: handle application/zip responses in the API client
+
 ## 0.5.13
 
 ### Patch Changes

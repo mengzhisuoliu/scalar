@@ -1,5 +1,87 @@
 # @scalar/echo-server
 
+## 0.7.1
+
+### Patch Changes
+
+- e0fc110: chore: patch bump all package
+
+## 0.7.0
+
+### Minor Changes
+
+- 7f8ef74: chore: remove aliasing
+
+### Patch Changes
+
+- 6fbb57e: feat: release all the packages
+
+## 0.6.4
+
+### Patch Changes
+
+- 45dc04b: fix: can’t release packages
+
+## 0.6.3
+
+### Patch Changes
+
+- 05e2e27: chore: add provenance statement
+
+## 0.6.2
+
+### Patch Changes
+
+- 07211ad: chore: added new lint rule for type importing for better perf
+
+## 0.6.1
+
+### Patch Changes
+
+- 22f2858: chore: ran syncpack to update packages
+
+## 0.6.0
+
+### Minor Changes
+
+- 7fb8273: Migrate to @scalar/openapi-parser
+
+## 0.5.14
+
+### Patch Changes
+
+- ef3a015: chore: update to typescript 5.4
+
+## 0.5.13
+
+### Patch Changes
+
+- 3b672cc: fix: revert css changes to components lib
+
+## 0.5.12
+
+### Patch Changes
+
+- 5bc2ebf: Add syntax highlighting back to codemirror
+
+## 0.5.11
+
+### Patch Changes
+
+- 1669b27: chore: update dependencies
+
+## 0.5.10
+
+### Patch Changes
+
+- c6b95ca: chore: upgrade from Vite 4 to Vite 5
+
+## 0.5.9
+
+### Patch Changes
+
+- 92a8b9f: chore: update dependencies
+
 ## 0.5.8
 
 ### Patch Changes

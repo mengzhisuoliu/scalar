@@ -1,9 +1,15 @@
 <script setup lang="ts">
+import { computed } from 'vue'
+
 import { useRequestStore } from '../../../stores'
+import type { GeneratedParameter } from '../../../types'
 import { CollapsibleSection } from '../../CollapsibleSection'
 import { Grid } from '../../Grid'
 
-defineProps<{ cookies?: any[] }>()
+const props = defineProps<{
+  cookies?: any[]
+  generatedCookies?: GeneratedParameter[]
+}>()
 
 const { activeRequest } = useRequestStore()
 
@@ -18,10 +24,16 @@ function addAnotherHandler() {
 
   activeRequest.cookies?.push({ name: '', value: '', enabled: true })
 }
+
+const hasCookies = computed(() => {
+  return !!(props.cookies?.length || props.generatedCookies?.length)
+})
 </script>
 <template>
-  <CollapsibleSection title="Cookies">
-    <template v-if="!cookies || cookies.length === 0">
+  <CollapsibleSection
+    :defaultOpen="hasCookies"
+    title="Cookies">
+    <template v-if="!hasCookies">
       <div class="scalar-api-client__empty-state">
         <button
           class="scalar-api-client-add"
@@ -39,7 +51,7 @@ function addAnotherHandler() {
               stroke="currentColor"
               stroke-linecap="round"
               stroke-linejoin="round"
-              stroke-width="3.429"
+              stroke-width="5"
               xmlns="http://www.w3.org/2000/svg"></path>
           </svg>
           Cookies
@@ -49,6 +61,7 @@ function addAnotherHandler() {
     <template v-else>
       <Grid
         addLabel="Cookie"
+        :generatedItems="generatedCookies"
         :items="cookies"
         @addAnother="addAnotherHandler"
         @deleteIndex="handleDeleteIndex" />
@@ -57,29 +70,31 @@ function addAnotherHandler() {
 </template>
 <style>
 .scalar-api-client-add {
-  color: var(--theme-color-2, var(--default-theme-color-2));
-  padding: 6px;
+  color: var(--scalar-color-3);
+  padding: 3px 6px;
   width: fit-content;
-  border-radius: var(--theme-radius, var(--default-theme-radius));
   cursor: pointer;
-  font-size: var(--theme-micro, var(--default-theme-micro));
-  font-weight: var(--theme-semibold, var(--default-theme-semibold));
+  font-size: var(--scalar-mini);
+  font-weight: var(--scalar-semibold);
+  text-decoration: none;
   margin: 0 6px;
   border: none;
-  font-family: var(--theme-font);
+  font-family: var(--scalar-font);
   appearance: none;
   display: flex;
   align-items: center;
+  border: 0.5px solid var(--scalar-border-color);
+  border-radius: var(--scalar-radius);
 }
 .scalar-api-client-add svg {
   width: 12px;
   height: 12px;
-  margin-right: 6px;
+  margin-right: 3px;
 }
 .scalar-api-client-add:hover {
-  color: var(--theme-color-1, var(--default-theme-color-1));
+  color: var(--scalar-color-1);
 }
 .scalar-api-client-add:focus-within {
-  background: var(--theme-background-3, var(--default-theme-background-3));
+  background: var(--scalar-background-3);
 }
 </style>
